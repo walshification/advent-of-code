@@ -1,4 +1,4 @@
-.PHONY: test lint pytest install clean
+.PHONY: test lint pytest install clean shell
 
 test: lint pytest
 
@@ -8,6 +8,9 @@ lint:
 
 pytest:
 	pipenv run pytest
+
+shell:
+	pipenv run ipython
 
 install:
 	pyenv install -s
