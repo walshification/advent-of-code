@@ -19,3 +19,14 @@ def test_elevator_follows_many_commands():
     elevator = Elevator()
     elevator.execute("(()(()(")
     assert elevator.floor == 3
+
+
+def test_elevator_keeps_log_of_movements():
+    elevator = Elevator()
+    elevator.execute("(()")
+    assert len(elevator.history) == 3
+    assert tuple((command, floor) for command, floor in elevator.history) == (
+        ("(", 1),
+        ("(", 2),
+        (")", 1),
+    )
