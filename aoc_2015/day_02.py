@@ -82,12 +82,22 @@ class Calculator:
         """
         return sum(self._calculate_square_feet(present) for present in self.presents)
 
+    def calculate_ribbon(self) -> int:
+        """Return total needed length of ribbon for the presents."""
+        return sum(self._calculate_ribbon_length(present) for present in self.presents)
+
     def _calculate_square_feet(self, present: Present) -> int:
         """Return total needed square feet of wrapping paper for a
         present.
         """
         return present.total_area + min(
             present.length_wise_area, present.width_wise_area, present.height_wise_area
+        )
+
+    def _calculate_ribbon_length(self, present: Present) -> int:
+        """Return length of ribbon needed for a single present."""
+        return present.shortest_perimeter + (
+            present.length * present.width * present.height
         )
 
 
@@ -98,4 +108,6 @@ if __name__ == "__main__":
             for dimensions in data
         ]
 
-    print(Calculator(presents).calculate_wrapping_paper())
+    calculator = Calculator(presents)
+    print(calculator.calculate_wrapping_paper())
+    print(calculator.calculate_ribbon())
