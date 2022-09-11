@@ -102,4 +102,4 @@ if __name__ == "__main__":
     robo_directions = directions[1::2]
     new_santa.deliver(human_directions)
     robo_santa.deliver(robo_directions)
-    print(f"Part 2: {len(new_santa.tracker - robo_santa.tracker)}")
+    print(f"Part 2: {len(new_santa.tracker | robo_santa.tracker)}")
