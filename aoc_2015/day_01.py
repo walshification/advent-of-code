@@ -50,7 +50,7 @@ class ElevatorEvent:
     command: str
     floor: int
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator:
         """Allow unpacking."""
         return iter((self.command, self.floor))
 
