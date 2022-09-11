@@ -14,9 +14,21 @@ However, the elf back at the north pole has had a little too much
 eggnog, and so his directions are a little off, and Santa ends up
 visiting some houses more than once. How many houses receive at least
 one present?
+
+--- Part Two ---
+
+The next year, to speed up the process, Santa creates a robot version
+of himself, Robo-Santa, to deliver presents with him.
+
+Santa and Robo-Santa start at the same location (delivering two
+presents to the same starting house), then take turns moving based on
+instructions from the elf, who is eggnoggedly reading from the same
+script as the previous year.
+
+This year, how many houses receive at least one present?
 """
 from collections import defaultdict
-from typing import Dict, Tuple
+from typing import Dict, Set, Tuple
 
 
 def move_north(x: int, y: int) -> Tuple[int, int]:
@@ -48,13 +60,17 @@ DIRECTION_TO_MOVEMENT_MAP = {
 
 
 class Santa:
-    """Representation of the Big Man to track his deliveries."""
+    """Representation of the Big Man to track his deliveries.
+
+    Attributes:
+      tracker (set): set of all the locations visited.
+    """
 
     def __init__(self) -> None:
         """Start Santa with a delivery at the default location."""
         self._position = (0, 0)
-        self._tracker: Dict[Tuple[int, int], int] = defaultdict(int)
-        self._tracker[self._position] += 1
+        self.tracker = set()
+        self.tracker.add(self._position)
 
     def deliver(self, directions: str) -> int:
         """Track Santa as he follows directions for deliveries.
@@ -67,9 +83,9 @@ class Santa:
         """
         for direction in directions:
             self._position = DIRECTION_TO_MOVEMENT_MAP[direction](*self._position)
-            self._tracker[self._position] += 1
+            self.tracker.add(self._position)
 
-        return len(self._tracker)
+        return len(self.tracker)
 
 
 if __name__ == "__main__":
@@ -78,4 +94,12 @@ if __name__ == "__main__":
         directions = data.read()[:-1]
 
     santa = Santa()
-    print(santa.deliver(directions))
+    print(f"Part 1: {santa.deliver(directions)}")
+
+    new_santa = Santa()
+    robo_santa = Santa()
+    human_directions = directions[::2]
+    robo_directions = directions[1::2]
+    new_santa.deliver(human_directions)
+    robo_santa.deliver(robo_directions)
+    print(f"Part 2: {len(new_santa.tracker - robo_santa.tracker)}")
