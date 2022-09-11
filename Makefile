@@ -2,6 +2,9 @@
 
 test: lint pytest
 
+fmt:
+	pipenv run black .
+
 lint:
 	pipenv run black . --check
 	pipenv run mypy .
