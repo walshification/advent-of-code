@@ -65,6 +65,16 @@ def validate_pair_of_pairs(string: str) -> bool:
     return False
 
 
+def validate_skipped_repeating_letters(string: str) -> bool:
+    """Return whether string contains repeated letters with a letter
+    between them (e.g. "xyx").
+    """
+    for i, c in enumerate(string[:-2]):
+        if c == string[i + 2]:
+            return True
+    return False
+
+
 VALIDATORS = [
     validate_vowels,
     validate_double_letters,

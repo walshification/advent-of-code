@@ -2,6 +2,7 @@ from aoc_2015.day_05 import (
     main,
     validate_double_letters,
     validate_pair_of_pairs,
+    validate_skipped_repeating_letters,
     validate_special_letters,
     validate_vowels,
 )
@@ -43,6 +44,15 @@ def test_validate_pair_of_pairs_finds_double_pairs_in_string():
 def test_validate_pair_of_pairs_returns_false_if_none():
     assert not validate_pair_of_pairs("acab")
     assert not validate_pair_of_pairs("abasdfcb")
+
+
+def test_validate_skipped_repeating_letters_finds_them():
+    assert validate_skipped_repeating_letters("xyx")
+    assert validate_skipped_repeating_letters("asdfdlkj")
+
+
+def test_validate_skipped_repeating_letters_returns_false_if_none():
+    assert not validate_skipped_repeating_letters("xayx")
 
 
 def test_main_runs_validators_on_strings_and_returns_number_that_pass():
