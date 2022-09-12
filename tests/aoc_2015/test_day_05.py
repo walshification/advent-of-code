@@ -1,8 +1,9 @@
 from aoc_2015.day_05 import (
     main,
     validate_double_letters,
-    validate_vowels,
+    validate_pair_of_pairs,
     validate_special_letters,
+    validate_vowels,
 )
 
 
@@ -32,6 +33,16 @@ def test_validate_special_letters_returns_false_for_special_letters():
 
 def test_validate_special_letters_returns_true_if_no_special_letters():
     assert validate_special_letters("asdfdb")
+
+
+def test_validate_pair_of_pairs_finds_double_pairs_in_string():
+    assert validate_pair_of_pairs("abab")
+    assert validate_pair_of_pairs("abasdfab")
+
+
+def test_validate_pair_of_pairs_returns_false_if_none():
+    assert not validate_pair_of_pairs("acab")
+    assert not validate_pair_of_pairs("abasdfcb")
 
 
 def test_main_runs_validators_on_strings_and_returns_number_that_pass():

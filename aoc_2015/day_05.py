@@ -57,6 +57,14 @@ def validate_special_letters(string: str) -> bool:
     return True
 
 
+def validate_pair_of_pairs(string: str) -> bool:
+    """Return whether string contains two letters that twice."""
+    for i, c in enumerate(string[:-2]):
+        if c + string[i + 1] in string[i + 2 :]:
+            return True
+    return False
+
+
 VALIDATORS = [
     validate_vowels,
     validate_double_letters,
