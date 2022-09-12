@@ -82,6 +82,12 @@ VALIDATORS = [
 ]
 
 
+PART_TWO_VALIDATORS = [
+    validate_pair_of_pairs,
+    validate_skipped_repeating_letters,
+]
+
+
 def main(
     strings: Sequence[str],
     validators: Sequence[Callable[[str], bool]] = VALIDATORS,
@@ -99,3 +105,4 @@ if __name__ == "__main__":
         strings = [string for string in data]
 
     print(f"Part 1: {main(strings)}")
+    print(f"Part 2: {main(strings, validators=PART_TWO_VALIDATORS)}")
