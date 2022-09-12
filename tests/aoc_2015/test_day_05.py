@@ -1,0 +1,47 @@
+from aoc_2015.day_05 import (
+    main,
+    validate_double_letters,
+    validate_vowels,
+    validate_special_letters,
+)
+
+
+def test_validate_vowels_returns_true_when_three_or_more():
+    assert validate_vowels("akekik")
+
+
+def test_validate_vowels_returns_false_when_less_than_three():
+    assert not validate_vowels("akekk")
+
+
+def test_validate_vowels_can_be_same():
+    assert validate_vowels("akakak")
+
+
+def test_validate_double_letters_finds_double_letters():
+    assert validate_double_letters("asddf")
+
+
+def test_validate_double_letters_returns_false_if_no_double_letters():
+    assert not validate_double_letters("asdfd")
+
+
+def test_validate_special_letters_returns_false_for_special_letters():
+    assert not validate_special_letters("ascdfd")
+
+
+def test_validate_special_letters_returns_true_if_no_special_letters():
+    assert validate_special_letters("asdfdb")
+
+
+def test_main_runs_validators_on_strings_and_returns_number_that_pass():
+    good_count = main(["akeddik"])
+    assert good_count == 1
+
+    good_count = main(["akeddik", "ascollub"])
+    assert good_count == 2
+
+
+def test_main_skips_strings_that_fail_validation():
+    good_count = main(["akeddk", "ascolub", "ascolluab"])
+    assert good_count == 0
