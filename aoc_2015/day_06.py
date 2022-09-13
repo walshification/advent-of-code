@@ -32,27 +32,30 @@ class Light:
     """Representation for a light that can be turned on or off.
 
     Attributes:
-      active (bool): whether the light is on or off.
+      active (int): whether the light is on or off.
     """
 
-    active: bool = False
+    active: int = 0
 
     def __repr__(self) -> str:
         return "*" if self.active else " "
 
-    def toggle(self) -> bool:
+    def toggle(self) -> int:
         """Flip the light switch and return its state."""
-        self.active = not self.active
+        if self.active:
+            self.turn_off()
+        else:
+            self.turn_on()
         return self.active
 
-    def turn_on(self) -> bool:
+    def turn_on(self) -> int:
         """Set active state to True. Return True."""
-        self.active = True
+        self.active = min(self.active + 1, 1)
         return self.active
 
-    def turn_off(self) -> bool:
+    def turn_off(self) -> int:
         """Set active state to False. Return False."""
-        self.active = False
+        self.active = min(self.active - 1, 0)
         return self.active
 
 
@@ -73,9 +76,7 @@ class Grid:
     @property
     def active_light_count(self) -> int:
         """Return count of currently active lights."""
-        return sum(
-            1 for column in self._coordinates for light in column if light.active
-        )
+        return sum(light.active for column in self._coordinates for light in column)
 
     def decorate(self, instructions: List[str]) -> int:
         """Active lights in the grid according to instructions.
