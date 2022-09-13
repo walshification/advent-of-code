@@ -23,7 +23,7 @@ lights by doing the instructions Santa sent you in order.
 After following the instructions, how many lights are lit?
 """
 from dataclasses import dataclass
-from typing import List, Type, Union
+from typing import List, Type, Tuple, Union
 
 
 @dataclass
@@ -112,18 +112,24 @@ class Grid:
           (int): count of currently active lights.
         """
         for instruction in instructions:
-            *operator, left_corner, _, right_corner = instruction.split()
-
-            x1, y1 = (int(coordinate) for coordinate in left_corner.split(","))
-            x2, y2 = (int(coordinate) for coordinate in right_corner.split(","))
-            if abs(x1 + y1) > abs(x2 + y2):
-                x1, y1, x2, y2 = x2, y2, x1, y1
+            x1, y1, x2, y2, operator = self._process_instruction(instruction)
 
             for i in range(x1, x2 + 1):
                 for j in range(y1, y2 + 1):
-                    getattr(self._coordinates[i][j], "_".join(operator))()
+                    getattr(self._coordinates[i][j], operator)()
 
         return self.active_light_count
+
+    def _process_instruction(self, instruction: str) -> Tuple[int, int, int, int, str]:
+        """Cast instruction into usable types."""
+        *operator, left_corner, _, right_corner = instruction.split()
+
+        x1, y1 = (int(coordinate) for coordinate in left_corner.split(","))
+        x2, y2 = (int(coordinate) for coordinate in right_corner.split(","))
+        if abs(x1 + y1) > abs(x2 + y2):
+            x1, y1, x2, y2 = x2, y2, x1, y1
+
+        return x1, y1, x2, y2, "_".join(operator)
 
 
 if __name__ == "__main__":
