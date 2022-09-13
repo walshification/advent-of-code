@@ -1,6 +1,6 @@
 from textwrap import dedent
 
-from aoc_2015.day_06 import Grid, Light
+from aoc_2015.day_06 import DimmableLight, Grid, Light
 
 
 def test_light_becomes_active_if_turned_on():
@@ -61,3 +61,22 @@ def test_grid_tracks_decorations_the_other_way():
         "                    \n"
         "                    \n"
     )
+
+
+def test_dimmable_light_tracks_brightness():
+    light = DimmableLight()
+    light.turn_on()
+    light.turn_on()
+    assert light.active == 2
+
+
+def test_dimmable_light_brightness_cant_be_negative():
+    light = DimmableLight()
+    light.turn_off()
+    assert light.active == 0
+
+
+def test_dimmable_light_toggle_increases_brightness_by_two():
+    light = DimmableLight()
+    light.toggle()
+    assert light.active == 2

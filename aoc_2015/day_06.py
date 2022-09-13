@@ -22,9 +22,8 @@ lights by doing the instructions Santa sent you in order.
 
 After following the instructions, how many lights are lit?
 """
-import os
 from dataclasses import dataclass
-from typing import List
+from typing import List, Type, Union
 
 
 @dataclass
@@ -55,16 +54,39 @@ class Light:
 
     def turn_off(self) -> int:
         """Set active state to False. Return False."""
-        self.active = min(self.active - 1, 0)
+        self.active = max(self.active - 1, 0)
+        return self.active
+
+
+@dataclass
+class DimmableLight(Light):
+    """Representation for a light that can be bright or off.
+
+    Attributes:
+      active (int): the light's brightness.
+    """
+
+    def toggle(self) -> int:
+        """Flip the light switch and return its state."""
+        self.active += 2
+        return self.active
+
+    def turn_on(self) -> int:
+        """Set active state to True. Return True."""
+        self.active += 1
         return self.active
 
 
 class Grid:
     """Your basic Cartesian grid."""
 
-    def __init__(self, length: int = 1000) -> None:
+    def __init__(
+        self, length: int = 1000, bulb_type: Type[Union[Light, DimmableLight]] = Light
+    ) -> None:
         """Build grid of lights to the length."""
-        self._coordinates = [[Light() for _ in range(length)] for _ in range(length)]
+        self._coordinates = [
+            [bulb_type() for _ in range(length)] for _ in range(length)
+        ]
 
     def __repr__(self) -> str:
         """Format the grid so it makes visual sense when printed."""
@@ -111,3 +133,7 @@ if __name__ == "__main__":
     grid = Grid()
     grid.decorate(instructions)
     print(f"Part 1: {grid.active_light_count}")
+
+    grid = Grid(bulb_type=DimmableLight)
+    grid.decorate(instructions)
+    print(f"Part 2: {grid.active_light_count}")
