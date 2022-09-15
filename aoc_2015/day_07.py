@@ -33,6 +33,12 @@ provide operators for these gates.
 
 In little Bobby's kit's instructions booklet (provided as your puzzle
 input), what signal is ultimately provided to wire a?
+
+--- Part Two ---
+
+Now, take the signal you got on wire a, override wire b to that signal,
+and reset the other wires (including wire a). What new signal is
+ultimately provided to wire a?
 """
 from typing import Dict, List
 
@@ -145,3 +151,7 @@ if __name__ == "__main__":
     circuit = Circuit.build(instructions)
     signal_a = circuit.trace("a")
     print(f"Part 1: {signal_a}")
+
+    circuit = Circuit.build(instructions)
+    circuit._wire_map["b"] = str(signal_a)
+    print(f"Part 2: {circuit.trace('a')}")
