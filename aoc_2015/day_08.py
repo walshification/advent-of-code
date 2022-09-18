@@ -23,35 +23,108 @@ Disregarding the whitespace in the file, what is the number of
 characters of code for string literals minus the number of characters
 in memory for the values of the strings in total for the entire file?
 """
+import re
 from dataclasses import dataclass
+from typing import List
+
+
+slash = re.compile(r"\\{2}")
+quote = re.compile(r"\\\"")
+special = re.compile(r"\\x[\d\w]{2}")
+normal = re.compile(r"[^\\{2}|\\\"|\\x[\d\w]{2}]?")
+
+
+class CodeSizer:
+
+    @classmethod
+    def calculate_code_size(cls, string: str) -> int:
+        """"""
+        return sum(
+            [
+                cls.get_slash_count(string),
+                cls.get_quote_count(string),
+                cls.get_special_count(string),
+                cls.get_normal_count(string),
+            ]
+        )
+
+    @classmethod
+    def get_quote_count(cls, string: str) -> int:
+        """Return the number of escaped quotation characters found."""
+        return len(quote.findall(string)) * 2
+
+    @classmethod
+    def get_slash_count(cls, string: str) -> int:
+        """Return the number of escaped slash characters found."""
+        return len(slash.findall(string)) * 2
+
+    @classmethod
+    def get_special_count(cls, string: str) -> int:
+        """Return the number of escaped special characters found."""
+        return len(special.findall(string)) * 4
+
+    @classmethod
+    def get_normal_count(cls, string: str) -> int:
+        """Return the number of normal characters found plus 2 for the
+        enclosing quotation marks.
+        """
+        return len(normal.findall(string)) + 2
+
+
+        return sum(
+            [
+                normal_character_length,
+                slash_length
+                # len(quote.findall(string)),
+                # len(special_character.findall(string)),
+                # len(string) - (3 * slash_length),
+            ]
+        )
 
 
 @dataclass
 class SpaceCounter:
-    """"""
+    """Counter for in-memory and code size of strings."""
 
-    def __init__(self, string: str) -> None:
-        self.string = string
+    def __init__(self, strings: str = None) -> None:
+        self.strings = strings or []
+        self.code_sizer = size_for_code
 
-    @property
-    def code_size(self) -> int:
+    def count(self) -> int:
+        """"""
+        return sum(
+            [
+                self.get_code_size(string) - self.get_in_memory_size(string)
+                for string in self.strings
+            ]
+        )
+
+    def get_code_size(self, string: str) -> int:
         """Return the size of the code characters of a string."""
-        return sum([self._count_for_code(c) for c in self.string]) + 2
+        return self.code_sizer(string)
+        # return sum(
+        #     [
+        #         len(slash.findall(string)),
+        #         len(quote.findall(string)),
+        #         len(string)
+        #     ]
+        # )
 
-    @property
-    def in_memory_size(self) -> int:
+    def get_in_memory_size(self, string: str) -> int:
         """Return the size of the in-memory characters of a string."""
-        return sum([self._count_for_memory(c) for c in self.string])
+        return sum(
+            [
+                len(string),
+                # Correct the count for memory.
+                -len(special_character.findall(string)) * 3,
+                -2,  # Account for quotation marks
+            ]
+        )
 
-    def _count_for_code(self, char: str) -> int:
-        """Return the size value for the character.
 
-        Escaped characters are actually 2 characters.
-        """
-        if char in ['"', "\\"]:
-            return 2
-        return 1
+if __name__ == "__main__":
+    with open("aoc_2015/inputs/day_08.txt") as data:
+        strings = [string[:-1] for string in data]
 
-    def _count_for_memory(self, char: str) -> int:
-        """Return the size value for the character."""
-        return 1
+    counter = SpaceCounter(strings)
+    print(f"Part 1: {counter.count()}")
