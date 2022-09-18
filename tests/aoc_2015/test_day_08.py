@@ -1,4 +1,4 @@
-from aoc_2015.day_08 import SpaceCounter, CodeSizer
+from aoc_2015.day_08 import SpaceCounter, CodeSizer, MemorySizer
 
 
 def test_code_sizer_measures_slash():
@@ -13,12 +13,32 @@ def test_code_sizer_measures_special_characters():
     assert CodeSizer.get_special_count('"\\x27"') == 4
 
 
-def test_code_sizer_measures_special_characters():
-    assert CodeSizer.get_special_count('"\\\\k\\"l\\x27"') == 4
+def test_code_sizer_measures_normal_characters():
+    assert CodeSizer.get_normal_count('"\\\\k\\"l\\x27"') == 2
 
 
 def test_code_sizer_measures_slash_quote_and_character_count():
     assert CodeSizer.calculate_code_size('"\\"\\\\l\\x27"') == 10
+
+
+def test_memory_sizer_measures_slash():
+    assert MemorySizer.get_slash_count('"\\\\"') == 1
+
+
+def test_memory_sizer_measures_quotes():
+    assert MemorySizer.get_quote_count('"\\""') == 1
+
+
+def test_memory_sizer_measures_special_characters():
+    assert MemorySizer.get_special_count('"\\x27"') == 1
+
+
+def test_memory_sizer_measures_normal_characters():
+    assert MemorySizer.get_normal_count('"\\\\k\\"l\\x27"') == 2
+
+
+def test_memory_sizer_measures_slash_quote_and_character_count():
+    assert MemorySizer.calculate_memory_size('"\\"\\\\l\\x27"') == 4
 
 
 # def test_counter_adds_2_to_code_count_for_surrounding_quotes():

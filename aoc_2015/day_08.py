@@ -71,15 +71,46 @@ class CodeSizer:
         return len(normal.findall(string)) + 2
 
 
+class MemorySizer:
+
+    @classmethod
+    def calculate_memory_size(cls, string: str) -> int:
+        """"""
+        slash_count = cls.get_slash_count(string)
+        quote_count = cls.get_quote_count(string)
+        special_count = cls.get_special_count(string)
+        normal_count = cls.get_normal_count(string)
         return sum(
             [
-                normal_character_length,
-                slash_length
-                # len(quote.findall(string)),
-                # len(special_character.findall(string)),
-                # len(string) - (3 * slash_length),
+                slash_count,
+                quote_count,
+                special_count,
+                normal_count,
             ]
         )
+
+    @classmethod
+    def get_quote_count(cls, string: str) -> int:
+        """Return the number of quotation characters rendered."""
+        return len(quote.findall(string))
+
+    @classmethod
+    def get_slash_count(cls, string: str) -> int:
+        """Return the number of slash characters rendered."""
+        return len(slash.findall(string))
+
+    @classmethod
+    def get_special_count(cls, string: str) -> int:
+        """Return the number of special characters rendered."""
+        return len(special.findall(string))
+
+    @classmethod
+    def get_normal_count(cls, string: str) -> int:
+        """Return the number of normal characters."""
+        slash_count = cls.get_slash_count(string)
+        quote_count = cls.get_quote_count(string)
+        special_count = cls.get_special_count(string)
+        return len(string) - (slash_count * 2) - (quote_count * 2) - (special_count * 4) - 2
 
 
 @dataclass
