@@ -10,12 +10,7 @@ lint:
 	pipenv run mypy .
 
 pytest:
-	# pipenv run pytest --cov-report term --cov-config=setup.cfg
-	pipenv run pytest \
-		--cov-config=setup.cfg \
-		--cov=aoc_2015 \
-		--cov-report html \
-		--cov-report term-missing
+	pipenv run pytest
 
 shell:
 	pipenv run ipython
