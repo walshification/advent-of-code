@@ -1,6 +1,6 @@
 import pytest
 
-from aoc_2022.day_02 import Paper, Player, Rock, RockPaperScissors, Scissors
+from aoc_2022.day_02 import Game2, Paper, Player, Rock, RockPaperScissors, Scissors
 
 
 @pytest.mark.parametrize(
@@ -52,3 +52,8 @@ def test_game():
     game = RockPaperScissors(Player(), Player(), ["A Y", "B X", "C Z", "A X"])
     score = game.run()
     assert score == 19
+
+
+def test_game2():
+    game = Game2(Player(), Player(), ["A Y", "B X", "C Z"])
+    assert game.run() == 12

@@ -36,6 +36,20 @@ strategy guide.
 
 What would your total score be if everything goes exactly according to
 your strategy guide?
+
+--- Part Two ---
+
+The Elf finishes helping with the tent and sneaks back over to you.
+"Anyway, the second column says how the round needs to end: X means you
+need to lose, Y means you need to end the round in a draw, and Z means
+you need to win. Good luck!"
+
+The total score is still calculated in the same way, but now you need
+to figure out what shape to choose so the round ends as indicated.
+
+Following the Elf's instructions for the second column, what would your
+total score be if everything goes exactly according to your strategy
+guide?
 """
 from dataclasses import dataclass, field
 from typing import Dict, List, Tuple
@@ -60,10 +74,6 @@ class Throw:
     def __lt__(self, other: "Throw") -> bool:
         """Rock beats Scissors; loses to Paper."""
         return self.CONFIG_MAP[type(other).__name__.lower()] == -1
-
-    def __eq__(self, other: object) -> bool:
-        """Rock beats Scissors; loses to Paper."""
-        return self.CONFIG_MAP[type(other).__name__.lower()] == 0
 
     def __add__(self, other: int) -> int:
         return self.value + other
@@ -155,6 +165,29 @@ class RockPaperScissors:
             self.player_two.scores.append(throw_two + 3)
 
 
+RESULT_MAP = {
+    ("X", "Rock"): Scissors(),
+    ("X", "Paper"): Rock(),
+    ("X", "Scissors"): Paper(),
+    ("Y", "Rock"): Rock(),
+    ("Y", "Scissors"): Scissors(),
+    ("Y", "Paper"): Paper(),
+    ("Z", "Rock"): Paper(),
+    ("Z", "Paper"): Scissors(),
+    ("Z", "Scissors"): Rock(),
+}
+
+
+@dataclass
+class Game2(RockPaperScissors):
+    """Reassess my choices."""
+
+    def decode_round(self, encoded_one, encoded_two) -> Tuple[Throw, Throw]:
+        throw_one = self.player_one.throw(encoded_one)
+        throw_two = RESULT_MAP[(encoded_two, throw_one.__class__.__name__)]
+        return throw_one, throw_two
+
+
 if __name__ == "__main__":
     with open("aoc_2022/inputs/day_02.txt") as data:
         rounds = [round for round in data]
@@ -162,4 +195,4 @@ if __name__ == "__main__":
     score = RockPaperScissors(Player(), Player(), rounds).run()
 
     print(f"Part 1: {score}")
-    # print(f"Part 2: {}")
+    print(f"Part 2: {Game2(Player(), Player(), rounds).run()}")
