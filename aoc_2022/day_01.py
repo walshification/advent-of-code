@@ -74,7 +74,7 @@ class Elf:
 
 
 class ElfStats:
-    """Collection of relavent Elf stats."""
+    """Collection of relevant Elf stats."""
 
     def __init__(self, elves: List[Elf]):
         top_3 = sorted(elves, reverse=True, key=lambda e: e.total_calories)[:3]
