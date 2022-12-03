@@ -153,3 +153,13 @@ class RockPaperScissors:
         else:
             self.player_one.scores.append(throw_one + 3)
             self.player_two.scores.append(throw_two + 3)
+
+
+if __name__ == "__main__":
+    with open("aoc_2022/inputs/day_02.txt") as data:
+        rounds = [round for round in data]
+
+    score = RockPaperScissors(Player(), Player(), rounds).run()
+
+    print(f"Part 1: {score}")
+    # print(f"Part 2: {}")
