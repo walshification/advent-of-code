@@ -37,6 +37,8 @@ strategy guide.
 What would your total score be if everything goes exactly according to
 your strategy guide?
 """
+from dataclasses import dataclass, field
+from typing import Dict, List
 
 
 class Throw:
@@ -89,3 +91,33 @@ class Scissors(Throw):
     }
 
     value: int = 3
+
+
+DECODER_MAP = {
+    "A": Rock(),
+    "B": Paper(),
+    "C": Scissors(),
+    "X": Rock(),
+    "Y": Paper(),
+    "Z": Scissors(),
+}
+
+
+@dataclass
+class Player:
+    """A player of Rock Paper Scissors."""
+
+    decoder_map: Dict[str, Throw] = field(default_factory=lambda: DECODER_MAP)
+    scores: List[int] = field(default_factory=list)
+
+    def throw(self, encoded_move: str) -> Throw:
+        """Return the value for a coded move."""
+        return self.decoder_map[encoded_move]
+
+
+@dataclass
+class RockPaperScissors:
+    """A game of Rock Paper Scissors."""
+
+    player_one: Player
+    player_two: Player
