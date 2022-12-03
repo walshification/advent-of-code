@@ -38,9 +38,10 @@ What would your total score be if everything goes exactly according to
 your strategy guide?
 """
 from dataclasses import dataclass, field
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 
+@dataclass
 class Throw:
     """Base class for a Rock Paper Scissors move."""
 
@@ -50,25 +51,32 @@ class Throw:
         "rock": 0,
     }
 
-    def __gt__(self, other: "Throw") -> int:
-        """Rock beats Scissors; loses to Paper."""
-        return self.CONFIG_MAP[type(other).__name__.lower()]
+    value: int = 0
 
-    def __lt__(self, other: "Throw") -> int:
+    def __gt__(self, other: "Throw") -> bool:
         """Rock beats Scissors; loses to Paper."""
-        return self.CONFIG_MAP[type(other).__name__.lower()]
+        return self.CONFIG_MAP[type(other).__name__.lower()] == 1
+
+    def __lt__(self, other: "Throw") -> bool:
+        """Rock beats Scissors; loses to Paper."""
+        return self.CONFIG_MAP[type(other).__name__.lower()] == -1
 
     def __eq__(self, other: object) -> bool:
         """Rock beats Scissors; loses to Paper."""
         return self.CONFIG_MAP[type(other).__name__.lower()] == 0
 
+    def __add__(self, other: int) -> int:
+        return self.value + other
 
+
+@dataclass
 class Rock(Throw):
     """Claustrophobic crusher of scissors."""
 
     value: int = 1
 
 
+@dataclass
 class Paper(Throw):
     """Haemophiliac cuddler of rocks."""
 
@@ -81,6 +89,7 @@ class Paper(Throw):
     value: int = 2
 
 
+@dataclass
 class Scissors(Throw):
     """Delicate slicer of paper."""
 
@@ -121,3 +130,26 @@ class RockPaperScissors:
 
     player_one: Player
     player_two: Player
+    encoded_rounds: List[str]
+
+    def run(self) -> int:
+        """Play a game and return player_two's score."""
+        for round in self.encoded_rounds:
+            throw_one, throw_two = self.decode_round(*(round.split()))
+            self.score_round(throw_one, throw_two)
+
+        return sum(self.player_two.scores)
+
+    def decode_round(self, encoded_one, encoded_two) -> Tuple[Throw, Throw]:
+        return self.player_one.throw(encoded_one), self.player_two.throw(encoded_two)
+
+    def score_round(self, throw_one, throw_two) -> None:
+        if throw_one > throw_two:
+            self.player_one.scores.append(throw_one + 6)
+            self.player_two.scores.append(throw_two.value)
+        elif throw_one < throw_two:
+            self.player_two.scores.append(throw_two + 6)
+            self.player_one.scores.append(throw_one.value)
+        else:
+            self.player_one.scores.append(throw_one + 3)
+            self.player_two.scores.append(throw_two + 3)

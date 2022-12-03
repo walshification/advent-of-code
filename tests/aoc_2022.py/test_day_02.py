@@ -1,6 +1,6 @@
 import pytest
 
-from aoc_2022.day_02 import Paper, Player, Rock, Scissors
+from aoc_2022.day_02 import Paper, Player, Rock, RockPaperScissors, Scissors
 
 
 @pytest.mark.parametrize(
@@ -46,3 +46,9 @@ def test_players_can_tie():
     player_one = Player()
     player_two = Player()
     assert player_one.throw("A") == player_two.throw("A")
+
+
+def test_game():
+    game = RockPaperScissors(Player(), Player(), ["A Y", "B X", "C Z", "A X"])
+    score = game.run()
+    assert score == 19
