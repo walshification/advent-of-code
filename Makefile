@@ -1,19 +1,31 @@
+VENV_BIN := .venv/bin
+AUTOFLAKE := $(VENV_BIN)/autoflake
+BLACK := $(VENV_BIN)/black
+IPYTHON := $(VENV_BIN)/ipython
+ISORT := $(VENV_BIN)/isort
+MYPY := $(VENV_BIN)/mypy
+PYTEST := $(VENV_BIN)/pytest
+
 .PHONY: test lint pytest install clean shell
 
 test: lint pytest
 
 fmt:
-	pipenv run black .
+	$(AUTOFLAKE) .
+	$(ISORT) .
+	$(BLACK) .
 
 lint:
-	pipenv run black . --check
-	pipenv run mypy .
+	$(AUTOFLAKE) --check .
+	# pipenv run isort --check-only .
+	$(BLACK) --check .
+	$(MYPY) .
 
 pytest:
-	pipenv run pytest
+	$(PYTEST)
 
 shell:
-	pipenv run ipython
+	$(IPYTHON)
 
 install:
 	pyenv install -s
