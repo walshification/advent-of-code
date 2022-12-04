@@ -1,4 +1,4 @@
-VENV_BIN := .venv/bin
+VENV_BIN := ./.venv/bin
 AUTOFLAKE := $(VENV_BIN)/autoflake
 BLACK := $(VENV_BIN)/black
 IPYTHON := $(VENV_BIN)/ipython
