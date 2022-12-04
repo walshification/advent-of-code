@@ -42,7 +42,6 @@ import re
 from dataclasses import dataclass
 from typing import List
 
-
 slash = re.compile(r"\\\\(?:(?!\\)|(?!\")|(?<!\\))")
 quote = re.compile(r"\\\"")
 special = re.compile(r"\\x[\d\w]{2}")

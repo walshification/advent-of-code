@@ -17,7 +17,6 @@ Now find one that starts with six zeroes.
 """
 from hashlib import md5
 
-
 SECRET_KEY = "iwrupvqb"
 
 

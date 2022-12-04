@@ -5,9 +5,11 @@ test: lint pytest
 fmt:
 	pipenv run black .
 	pipenv run isort .
+	pipenv run autoflake .
 
 lint:
 	pipenv run black . --check
+	pipenv run autoflake --check .
 	pipenv run mypy .
 
 pytest:

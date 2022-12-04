@@ -1,4 +1,4 @@
-from aoc_2015.day_08 import SpaceCounter, CodeSizer, MemorySizer
+from aoc_2015.day_08 import CodeSizer, MemorySizer, SpaceCounter
 
 
 class TestCodeSizer:
