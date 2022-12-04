@@ -4,6 +4,7 @@ test: lint pytest
 
 fmt:
 	pipenv run black .
+	pipenv run isort .
 
 lint:
 	pipenv run black . --check
