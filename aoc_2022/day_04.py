@@ -61,16 +61,30 @@ need of reconsideration. In this example, there are 2 such pairs.
 
 In how many assignment pairs does one range fully contain the other?
 """
-from dataclasses import dataclass
+from typing import List
 
 
-@dataclass
 class Assignment:
     """A cleaning assignment."""
 
-    sections: str
+    def __init__(self, sections: str):
+        """Expand assignments (e.g. "1-4" becomes {1, 2, 3, 4})."""
+        start, end = sections.split("-")
+        self.sections = set(i for i in range(int(start), int(end) + 1))
 
-    def __post_init__(self):
-        """Expand section assignments (e.g. "1-4" becomes "1234")."""
-        start, end = self.sections.split("-")
-        self.sections = "".join(str(i) for i in range(int(start), int(end) + 1))
+    def __sub__(self, other: "Assignment") -> set:
+        """Return the difference in sections from another."""
+        return self.sections - other.sections
+
+
+def assess(section_pairs: List[str]) -> int:
+    """Deduce how many section pairs contain each other fully."""
+    return sum(check_for_containment(pair) for pair in section_pairs)
+
+
+def check_for_containment(pair):
+    first, second = pair.split(",")
+    first, second = Assignment(first), Assignment(second)
+    if not first - second or not second - first:
+        return 1
+    return 0
