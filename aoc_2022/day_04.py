@@ -98,26 +98,18 @@ def assess(section_pairs: List[str]) -> Tuple[int, int]:
             count of assignments overlapping at all,
         )
     """
-    return (
-        sum(check_for_containment(pair) for pair in section_pairs),
-        sum(check_for_overlapping(pair) for pair in section_pairs),
-    )
+    containment_tracker = []
+    overlapping_tracker = []
+    for pair in section_pairs:
+        raw_first, raw_second = pair.split(",")
+        first, second = Assignment(raw_first), Assignment(raw_second)
+        if not first - second or not second - first:
+            containment_tracker.append(1)
+            overlapping_tracker.append(1)
+        elif first & second:
+            overlapping_tracker.append(1)
 
-
-def check_for_containment(pair) -> int:
-    first, second = pair.split(",")
-    first, second = Assignment(first), Assignment(second)
-    if not first - second or not second - first:
-        return 1
-    return 0
-
-
-def check_for_overlapping(pair) -> int:
-    first, second = pair.split(",")
-    first, second = Assignment(first), Assignment(second)
-    if first & second:
-        return 1
-    return 0
+    return sum(containment_tracker), sum(overlapping_tracker)
 
 
 if __name__ == "__main__":
