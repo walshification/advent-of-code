@@ -60,8 +60,16 @@ their partner will already be cleaning, so these seem like the most in
 need of reconsideration. In this example, there are 2 such pairs.
 
 In how many assignment pairs does one range fully contain the other?
+
+--- Part Two ---
+
+It seems like there is still quite a bit of duplicate work planned.
+Instead, the Elves would like to know the number of pairs that overlap
+at all.
+
+In how many assignment pairs do the ranges overlap?
 """
-from typing import List
+from typing import List, Tuple
 
 
 class Assignment:
@@ -72,19 +80,50 @@ class Assignment:
         start, end = sections.split("-")
         self.sections = set(i for i in range(int(start), int(end) + 1))
 
+    def __and__(self, other: "Assignment") -> set:
+        """Return the union of sections with another."""
+        return self.sections & other.sections
+
     def __sub__(self, other: "Assignment") -> set:
         """Return the difference in sections from another."""
         return self.sections - other.sections
 
 
-def assess(section_pairs: List[str]) -> int:
-    """Deduce how many section pairs contain each other fully."""
-    return sum(check_for_containment(pair) for pair in section_pairs)
+def assess(section_pairs: List[str]) -> Tuple[int, int]:
+    """Check section pairs for overlapping assignments.
+
+    Returns:
+        (
+            count of assignments fully containing the other,
+            count of assignments overlapping at all,
+        )
+    """
+    return (
+        sum(check_for_containment(pair) for pair in section_pairs),
+        sum(check_for_overlapping(pair) for pair in section_pairs),
+    )
 
 
-def check_for_containment(pair):
+def check_for_containment(pair) -> int:
     first, second = pair.split(",")
     first, second = Assignment(first), Assignment(second)
     if not first - second or not second - first:
         return 1
     return 0
+
+
+def check_for_overlapping(pair) -> int:
+    first, second = pair.split(",")
+    first, second = Assignment(first), Assignment(second)
+    if first & second:
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    with open("aoc_2022/inputs/day_04.txt") as data:
+        assignment_pairs = [pair for pair in data]
+
+    containment, overlapping = assess(assignment_pairs)
+    print(f"Part One: {containment}")
+    print(f"Part Two: {overlapping}")
