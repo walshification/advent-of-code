@@ -27,8 +27,7 @@ script as the previous year.
 
 This year, how many houses receive at least one present?
 """
-from collections import defaultdict
-from typing import Dict, Set, Tuple
+from typing import Tuple
 
 
 def move_north(x: int, y: int) -> Tuple[int, int]:

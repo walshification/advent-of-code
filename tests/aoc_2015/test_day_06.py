@@ -1,5 +1,3 @@
-from textwrap import dedent
-
 from aoc_2015.day_06 import DimmableLight, Grid, Light
 
 
