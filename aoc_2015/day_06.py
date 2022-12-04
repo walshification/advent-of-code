@@ -23,7 +23,7 @@ lights by doing the instructions Santa sent you in order.
 After following the instructions, how many lights are lit?
 """
 from dataclasses import dataclass
-from typing import List, Type, Tuple, Union
+from typing import List, Tuple, Type, Union
 
 
 @dataclass
