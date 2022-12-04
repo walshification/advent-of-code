@@ -23,7 +23,7 @@ jobs:
         name: Install pipenv
         run: curl https://raw.githubusercontent.com/pypa/pipenv/master/get-pipenv.py | python
       -
-        run: make install-dev
+        run: pipenv install --dev
       -
         name: Test
         run: make test
