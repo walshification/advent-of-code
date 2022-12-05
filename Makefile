@@ -1,19 +1,31 @@
+PIPENV_RUN := pipenv run
+AUTOFLAKE := $(PIPENV_RUN) autoflake
+BLACK := $(PIPENV_RUN) black
+IPYTHON := $(PIPENV_RUN) ipython
+ISORT := $(PIPENV_RUN) isort
+MYPY := $(PIPENV_RUN) mypy
+PYTEST := $(PIPENV_RUN) pytest
+
 .PHONY: test lint pytest install clean shell
 
 test: lint pytest
 
 fmt:
-	pipenv run black .
+	$(AUTOFLAKE) .
+	$(ISORT) .
+	$(BLACK) .
 
 lint:
-	pipenv run black . --check
-	pipenv run mypy .
+	$(AUTOFLAKE) --check .
+	# pipenv run isort --check-only .
+	$(BLACK) --check .
+	$(MYPY) .
 
 pytest:
-	pipenv run pytest
+	$(PYTEST)
 
 shell:
-	pipenv run ipython
+	$(IPYTHON)
 
 install:
 	pyenv install -s

@@ -1,0 +1,7 @@
+.coverage
+.git
+.env
+.mypy_cache
+.pytest_cache
+.python-version
+.venv

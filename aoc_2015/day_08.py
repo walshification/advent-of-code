@@ -40,8 +40,7 @@ puzzle) is 42 - 23 = 19.
 import ast
 import re
 from dataclasses import dataclass
-from typing import List
-
+from typing import List, Optional
 
 slash = re.compile(r"\\\\(?:(?!\\)|(?!\")|(?<!\\))")
 quote = re.compile(r"\\\"")
@@ -133,7 +132,7 @@ class MemorySizer:
 class SpaceCounter:
     """Counter for in-memory and code size of strings."""
 
-    def __init__(self, strings: List[str] = None) -> None:
+    def __init__(self, strings: Optional[List[str]] = None) -> None:
         self.strings = strings or []
         self.code_sizer = CodeSizer
         self.memory_sizer = MemorySizer

@@ -1,0 +1,5 @@
+version: "3.10"
+services:
+  app:
+    build: .
+    image: walshification/advent-of-code:latest

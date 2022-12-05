@@ -1,4 +1,4 @@
-from aoc_2015.day_08 import SpaceCounter, CodeSizer, MemorySizer
+from aoc_2015.day_08 import CodeSizer, MemorySizer, SpaceCounter
 
 
 class TestCodeSizer:
@@ -78,3 +78,8 @@ def test_counter_accounts_for_weird_characters():
 def test_counter_subtracts_length_from_in_memory():
     counter = SpaceCounter(['"\\x27"'])
     assert counter.count() == 5
+
+
+def test_counter_counts_escaped_characters():
+    counter = SpaceCounter(['"aaa\\"aaa"'])  # fmt: skip
+    assert counter.escaped_count() == 6
