@@ -1,3 +1,3 @@
-# Advent of Code [![Build Status](https://app.travis-ci.com/walshification/advent-of-code.svg?branch=main)](https://app.travis-ci.com/walshification/advent-of-code)
+# Advent of Code ![Build Status](https://github.com/github/docs/actions/workflows/main.yml/badge.svg)
 
 Solutions and sundry for all things [Advent of Code](https://adventofcode.com).
