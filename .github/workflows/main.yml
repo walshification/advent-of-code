@@ -15,8 +15,7 @@ jobs:
         name: Checkout
         uses: actions/checkout@v3
       -
-        name: Install pipenv
-        uses: actions/setup-python@v4
+        name: Install dependencies
         with:
           python-version: '3.10'
           cache: 'pipenv'
