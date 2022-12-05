@@ -1,4 +1,4 @@
-name: Build
+name: ci
 
 on:
   pull_request:
@@ -15,13 +15,16 @@ jobs:
         name: Checkout
         uses: actions/checkout@v3
       -
-        name: Install pipenv
-        run: pip install --upgrade pip && pip install pipenv
-      -
+        name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
           cache: 'pipenv'
+      -
+        name: Install pipenv
+        run: curl https://raw.githubusercontent.com/pypa/pipenv/master/get-pipenv.py | python
+      -
+        name: Install Dependencies
         run: pipenv install --dev
       -
         name: Test
