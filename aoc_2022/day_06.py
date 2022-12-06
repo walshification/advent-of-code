@@ -33,9 +33,21 @@ buffer to the end of the first such four-character marker.
 
 How many characters need to be processed before the first
 start-of-packet marker is detected?
+
+--- Part Two ---
+
+Your device's communication system is correctly detecting packets, but
+still isn't working. It looks like it also needs to look for messages.
+
+A start-of-message marker is just like a start-of-packet marker, except
+it consists of 14 distinct characters rather than 4.
+
+How many characters need to be processed before the first
+start-of-message marker is detected?
 """
 from collections import deque
 from dataclasses import dataclass
+from typing import Deque, Optional
 
 
 @dataclass
@@ -44,11 +56,11 @@ class Receiver:
 
     signal: str
 
-    def find_marker(self, marker_length: int = 4) -> int:
+    def find_marker(self, marker_length: int = 4) -> Optional[int]:
         """Return the first position after the first four unique
         characters in the signal.
         """
-        buffer = deque()
+        buffer: Deque[str] = deque()
         for i, char in enumerate(self.signal):
             buffer.append(char)
             if len(buffer) == marker_length:
@@ -56,6 +68,7 @@ class Receiver:
                     return i + 1
 
                 buffer.popleft()
+        return None
 
     def is_unique(self, buffer) -> bool:
         """Return whether or not buffer characters are unique."""
@@ -69,4 +82,4 @@ if __name__ == "__main__":
     receiver = Receiver(signal)
 
     print(f"Part One: {receiver.find_marker()}")
-    # print(f"Part Two: {}")
+    print(f"Part Two: {receiver.find_marker(14)}")
