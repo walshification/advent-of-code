@@ -86,6 +86,7 @@ that the Elves know where they should stand to be ready to unload the
 final supplies. After the rearrangement procedure completes, what crate
 ends up on top of each stack?
 """
+import copy
 from dataclasses import dataclass
 from typing import Dict, List, Optional
 
@@ -193,8 +194,8 @@ STARTING_STACKS = {
 class Inventory:
     """Stacks of supplies needed by the Elves."""
 
-    def __init__(self, stacks: Dict[int, Stack] = STARTING_STACKS):
-        self.stacks = stacks
+    def __init__(self, stacks: Optional[Dict[int, Stack]] = None):
+        self.stacks = stacks or copy.deepcopy(STARTING_STACKS)
 
     def __str__(self) -> str:
         """Display inventory in stacked columns."""
@@ -265,7 +266,11 @@ if __name__ == "__main__":
         commands = [command[:-1] for command in data][10:]
 
     crane = CrateMover9000(Inventory())
+    crane_9001 = CrateMover9001(Inventory())
+
     top_supplies = crane.rearrange(commands)
+    revised_top_supplies = crane_9001.rearrange(commands)
 
     print(crane.inventory)
     print(f"Part One: {top_supplies}")
+    print(f"Part Two: {revised_top_supplies}")

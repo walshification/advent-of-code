@@ -68,3 +68,23 @@ def test_cratemover9001_moves_supplies_as_a_unit():
     top_supplies = crane.rearrange(["move 2 from 1 to 2"])
 
     assert top_supplies == "Z"
+
+
+def test_the_sample():
+    stacks = {
+        1: Stack([Supply("Z"), Supply("N")]),
+        2: Stack([Supply("M"), Supply("C"), Supply("D")]),
+        3: Stack([Supply("P")]),
+    }
+    crane = CrateMover9001(Inventory(stacks))
+
+    top_supplies = crane.rearrange(
+        [
+            "move 1 from 2 to 1",
+            "move 3 from 1 to 3",
+            "move 2 from 2 to 1",
+            "move 1 from 1 to 2",
+        ]
+    )
+
+    assert top_supplies == "MCD"
