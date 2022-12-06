@@ -161,6 +161,18 @@ class Crane:
 
     inventory: Inventory
 
+    def rearrange(self, commands: List[str]) -> str:
+        """Rearrange per commands and return top supplies."""
+        for command in commands:
+            _, count, _, source, _, destination = command.split()
+            self.move_supplies(int(count), int(source), int(destination))
+
+        return "".join(
+            str(supply)[1]  # just get the letter
+            for stack in self.inventory.stacks.values()
+            if (supply := stack[-1])
+        )
+
     def move_supplies(self, supply_count: int, source: int, destination: int) -> None:
         """Move supplies from source column to destination."""
         for _ in range(supply_count):

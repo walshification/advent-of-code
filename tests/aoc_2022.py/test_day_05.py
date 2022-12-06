@@ -44,3 +44,15 @@ def test_crane_can_move_supplies_from_column_to_column():
 
     assert len(inventory.stacks[1]) == 0
     assert len(inventory.stacks[2]) == 3
+
+
+def test_crane_accepts_string_commands():
+    stacks = [Stack([Supply("S"), Supply("Z")]), Stack([Supply("N")])]
+    inventory = Inventory(
+        {column: stack for column, stack in enumerate(stacks, start=1)}
+    )
+    crane = Crane(inventory)
+
+    top_supplies = crane.rearrange(["move 2 from 1 to 2"])
+
+    assert top_supplies == "S"
