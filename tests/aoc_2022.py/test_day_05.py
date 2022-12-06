@@ -1,6 +1,6 @@
 from textwrap import dedent
 
-from aoc_2022.day_05 import CrateMover9000, Inventory, Stack, Supply
+from aoc_2022.day_05 import CrateMover9000, CrateMover9001, Inventory, Stack, Supply
 
 
 def test_inventory_renders_nicely():
@@ -56,3 +56,15 @@ def test_crane_accepts_string_commands():
     top_supplies = crane.rearrange(["move 2 from 1 to 2"])
 
     assert top_supplies == "S"
+
+
+def test_cratemover9001_moves_supplies_as_a_unit():
+    stacks = [Stack([Supply("S"), Supply("Z")]), Stack([Supply("N")])]
+    inventory = Inventory(
+        {column: stack for column, stack in enumerate(stacks, start=1)}
+    )
+    crane = CrateMover9001(inventory)
+
+    top_supplies = crane.rearrange(["move 2 from 1 to 2"])
+
+    assert top_supplies == "Z"

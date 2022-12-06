@@ -22,6 +22,69 @@ the rearrangement procedure (your puzzle input).
 
 After the rearrangement procedure completes, what crate ends up on top
 of each stack?
+
+--- Part Two ---
+
+As you watch the crane operator expertly rearrange the crates, you
+notice the process isn't following your prediction.
+
+Some mud was covering the writing on the side of the crane, and you
+quickly wipe it away. The crane isn't a CrateMover 9000 - it's a
+CrateMover 9001.
+
+The CrateMover 9001 is notable for many new and exciting features: air
+conditioning, leather seats, an extra cup holder, and the ability to
+pick up and move multiple crates at once.
+
+Again considering the example above, the crates begin in the same configuration:
+
+    [D]
+[N] [C]
+[Z] [M] [P]
+ 1   2   3
+
+Moving a single crate from stack 2 to stack 1 behaves the same as before:
+
+[D]
+[N] [C]
+[Z] [M] [P]
+ 1   2   3
+
+However, the action of moving three crates from stack 1 to stack 3 means
+that those three moved crates stay in the same order, resulting in this
+new configuration:
+
+        [D]
+        [N]
+    [C] [Z]
+    [M] [P]
+ 1   2   3
+
+Next, as both crates are moved from stack 2 to stack 1, they retain
+their order as well:
+
+        [D]
+        [N]
+[C]     [Z]
+[M]     [P]
+ 1   2   3
+
+Finally, a single crate is still moved from stack 1 to stack 2, but now
+it's crate C that gets moved:
+
+        [D]
+        [N]
+        [Z]
+[M] [C] [P]
+ 1   2   3
+
+In this example, the CrateMover 9001 has put the crates in a totally
+different order: MCD.
+
+Before the rearrangement process finishes, update your simulation so
+that the Elves know where they should stand to be ready to unload the
+final supplies. After the rearrangement procedure completes, what crate
+ends up on top of each stack?
 """
 from dataclasses import dataclass
 from typing import Dict, List, Optional
@@ -156,7 +219,7 @@ class Inventory:
 
 
 @dataclass
-class Crane:
+class CrateMover9000:
     """Use to rearrange inventory supplies."""
 
     inventory: Inventory
@@ -183,11 +246,25 @@ class Crane:
         self.inventory.stacks[destination].append(self.inventory.stacks[source].pop())
 
 
+@dataclass
+class CrateMover9001(CrateMover9000):
+    """The latest model."""
+
+    def move_supplies(self, supply_count: int, source: int, destination: int) -> None:
+        """Move supplies from source column to destination, preserving
+        order.
+        """
+        crates_to_move = [
+            self.inventory.stacks[source].pop() for _ in range(supply_count)
+        ]
+        self.inventory.stacks[destination].supplies.extend(crates_to_move[::-1])
+
+
 if __name__ == "__main__":
     with open("aoc_2022/inputs/day_05.txt") as data:
         commands = [command[:-1] for command in data][10:]
 
-    crane = Crane(Inventory())
+    crane = CrateMover9000(Inventory())
     top_supplies = crane.rearrange(commands)
 
     print(crane.inventory)
