@@ -50,6 +50,14 @@ class Stack:
     def __len__(self) -> int:
         return len(self.supplies)
 
+    def append(self, supply: Supply) -> None:
+        """Add the supply to the top of the stack."""
+        self.supplies.append(supply)
+
+    def pop(self) -> Supply:
+        """Return the top supply in the stack."""
+        return self.supplies.pop()
+
 
 STARTING_STACKS = {
     1: Stack(
@@ -145,3 +153,19 @@ class Inventory:
         lines.append(row.rstrip())
 
         return "\n".join(line.rstrip() for line in lines)
+
+
+@dataclass
+class Crane:
+    """Use to rearrange inventory supplies."""
+
+    inventory: Inventory
+
+    def move_supplies(self, supply_count: int, source: int, destination: int) -> None:
+        """Move supplies from source column to destination."""
+        for _ in range(supply_count):
+            self.move_supply(source, destination)
+
+    def move_supply(self, source: int, destination: int) -> None:
+        """Move the top supply from source column to destination."""
+        self.inventory.stacks[destination].append(self.inventory.stacks[source].pop())
