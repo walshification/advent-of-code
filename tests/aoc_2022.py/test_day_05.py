@@ -1,6 +1,6 @@
 from textwrap import dedent
 
-from aoc_2022.day_05 import Crane, Inventory, Stack, Supply
+from aoc_2022.day_05 import CrateMover9000, Inventory, Stack, Supply
 
 
 def test_inventory_renders_nicely():
@@ -21,7 +21,7 @@ def test_crane_can_move_supply_from_column_to_column():
     inventory = Inventory(
         {column: stack for column, stack in enumerate(stacks, start=1)}
     )
-    crane = Crane(inventory)
+    crane = CrateMover9000(inventory)
 
     crane.move_supply(1, 2)
 
@@ -38,7 +38,7 @@ def test_crane_can_move_supplies_from_column_to_column():
     inventory = Inventory(
         {column: stack for column, stack in enumerate(stacks, start=1)}
     )
-    crane = Crane(inventory)
+    crane = CrateMover9000(inventory)
 
     crane.move_supplies(2, 1, 2)
 
@@ -51,7 +51,7 @@ def test_crane_accepts_string_commands():
     inventory = Inventory(
         {column: stack for column, stack in enumerate(stacks, start=1)}
     )
-    crane = Crane(inventory)
+    crane = CrateMover9000(inventory)
 
     top_supplies = crane.rearrange(["move 2 from 1 to 2"])
 

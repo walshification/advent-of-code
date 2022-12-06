@@ -181,3 +181,14 @@ class Crane:
     def move_supply(self, source: int, destination: int) -> None:
         """Move the top supply from source column to destination."""
         self.inventory.stacks[destination].append(self.inventory.stacks[source].pop())
+
+
+if __name__ == "__main__":
+    with open("aoc_2022/inputs/day_05.txt") as data:
+        commands = [command[:-1] for command in data][10:]
+
+    crane = Crane(Inventory())
+    top_supplies = crane.rearrange(commands)
+
+    print(crane.inventory)
+    print(f"Part One: {top_supplies}")
