@@ -60,3 +60,13 @@ class Receiver:
     def is_unique(self, buffer) -> bool:
         """Return whether or not buffer characters are unique."""
         return len(set(buffer)) == len(buffer)
+
+
+if __name__ == "__main__":
+    with open("aoc_2022/inputs/day_06.txt") as data:
+        signal = data.readline()
+
+    receiver = Receiver(signal)
+
+    print(f"Part One: {receiver.find_marker()}")
+    # print(f"Part Two: {}")
