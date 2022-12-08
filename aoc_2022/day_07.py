@@ -169,11 +169,15 @@ class Filesystem:
             line = log[i]
             if "cd" in line:
                 _, _, target = line.split()
-                if target not in fs.cwd.children:
-                    fs.cwd.children[target] = Directory(target)
+                if ".." in target:
+                    fs.cwd = fs.cwd.parent
+                    i += 1
+                else:
+                    # if target not in fs.cwd.children:
+                    #     fs.cwd.children[target] = Directory(target)
 
-                fs.cwd = fs.cwd.children[target]
-                i += 1
+                    fs.cwd = fs.cwd.children[target]
+                    i += 1
 
             if "ls" in line:
                 i += 1
@@ -182,7 +186,6 @@ class Filesystem:
                     fs.cwd.children[content.name] = content
                     i += 1
 
-        fs.cwd = fs.tree["/"]
         return fs
 
     def has_content(self, log: List[str], i: int) -> bool:
