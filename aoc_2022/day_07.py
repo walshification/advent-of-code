@@ -115,27 +115,56 @@ more than once!)
 Find all of the directories with a total size of at most 100000. What is
 the sum of the total sizes of those directories?
 """
-from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Union
 
 
-@dataclass
-class File:
+class Node:
+    """One point in a tree."""
+
+    def __init__(
+        self,
+        name: str,
+        size: int = 0,
+        parent: Optional["Node"] = None,
+        children: Optional[Dict[str, "Node"]] = None,
+    ):
+        self.name = name
+        self.parent = parent
+        self.children = children or {}
+        self._size = size
+
+    def __repr__(self) -> str:
+        """Return repr."""
+        class_name = self.__class__.__name__
+        name = self.name
+        size = str(self.size)
+        parent = self.parent
+        children = list(name for name in self.children.keys())
+        return (
+            f"{class_name}(name={name}, "
+            f"size={size}, parent={parent}, children={children})"
+        )
+
+    @property
+    def size(self) -> int:
+        return self._size
+
+    def child(self, node_name: str) -> "Node":
+        """Return a child node by name."""
+        return self.children[node_name]
+
+
+class File(Node):
     """Data in bytes."""
 
-    name: str
-    size: int
-    parent: "Directory"
 
-
-@dataclass
-class Directory:
+class Directory(Node):
     """A container for directories and files."""
 
-    name: str
-    parent: Optional["Directory"] = None
-    size: int = 0
-    children: Dict[str, Union["Directory", File]] = field(default_factory=dict)
+    @property
+    def size(self) -> int:
+        """Return size of all directory's contents."""
+        return sum(content.size for content in self.children.values())
 
 
 class ContentFactory:
@@ -143,27 +172,23 @@ class ContentFactory:
     def make(log_line: str, cwd: Directory) -> Union[Directory, File]:
         if "dir" in log_line:
             _, name = log_line.split()
-            return Directory(name, parent=cwd)
+            return Directory(name=name, parent=cwd)
 
         size, name = log_line.split()
-        return File(name, int(size), cwd)
+        return File(name=name, size=int(size), parent=cwd)
 
 
-@dataclass
 class Filesystem:
     """Filesystem of an Elven device."""
 
-    cwd: Directory
-    tree: Dict[str, Directory | File] = field(default_factory=dict)
-
-    def __post_init__(self) -> None:
-        """Assign root to the filesystem."""
-        self.tree["/"] = self.cwd
+    def __init__(self, root: Directory) -> None:
+        self.root = root
+        self.cwd = self.root
 
     @classmethod
-    def from_log(cls, log: List[str]) -> "Filesystem":
+    def build_from_log(cls, log: List[str]) -> "Filesystem":
         """Map a filesystem from a log."""
-        fs = Filesystem(cwd=Directory("/"))
+        fs = cls(root=Directory(name="/"))
         i = 1
         while i < len(log):
             line = log[i]
@@ -173,9 +198,6 @@ class Filesystem:
                     fs.cwd = fs.cwd.parent  # type: ignore
                     i += 1
                 else:
-                    # if target not in fs.cwd.children:
-                    #     fs.cwd.children[target] = Directory(target)
-
                     fs.cwd = fs.cwd.children[target]  # type: ignore
                     i += 1
 
