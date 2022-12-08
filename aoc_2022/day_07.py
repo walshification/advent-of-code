@@ -116,7 +116,7 @@ Find all of the directories with a total size of at most 100000. What is
 the sum of the total sizes of those directories?
 """
 from dataclasses import dataclass, field
-from typing import Dict, Union
+from typing import Dict, List, Optional, Union
 
 
 @dataclass
@@ -131,14 +131,37 @@ class File:
 class Directory:
     """A container for directories and files."""
 
-    parent: "Directory"
     name: str
+    parent: Optional["Directory"] = None
     size: int = 0
     children: Dict[str, Union["Directory", File]] = field(default_factory=dict)
 
 
 @dataclass
-class FileSystem:
-    """File system of an Elven device."""
+class Filesystem:
+    """Filesystem of an Elven device."""
 
-    tree: Dict[str, Union[Directory, File]] = field(default_factory=dict)
+    cwd: Directory
+    tree: Dict[str, Directory | File] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        """Assign root to the filesystem."""
+        self.tree["/"] = self.cwd
+
+    @classmethod
+    def from_log(cls, log: List[str]) -> "Filesystem":
+        """Map a filesystem from a log."""
+        fs = Filesystem(cwd=Directory("/"))
+        i = 0
+        while i < len(log):
+            line = log[i]
+            if "cd" in line:
+                _, target = line.split()
+                if target not in fs.cwd.children:
+                    fs.cwd.children[target] = Directory(target)
+
+                fs.cwd = fs.cwd.children[target]
+                i += 1
+
+        fs.cwd = fs.tree["/"]
+        return fs
