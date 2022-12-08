@@ -125,6 +125,7 @@ class File:
 
     name: str
     size: int
+    parent: "Directory"
 
 
 @dataclass
@@ -135,6 +136,17 @@ class Directory:
     parent: Optional["Directory"] = None
     size: int = 0
     children: Dict[str, Union["Directory", File]] = field(default_factory=dict)
+
+
+class ContentFactory:
+    @staticmethod
+    def make(log_line: str, cwd: Directory) -> Union[Directory, File]:
+        if "dir" in log_line:
+            _, name = log_line.split()
+            return Directory(name, parent=cwd)
+
+        size, name = log_line.split()
+        return File(name, int(size), cwd)
 
 
 @dataclass
@@ -152,16 +164,30 @@ class Filesystem:
     def from_log(cls, log: List[str]) -> "Filesystem":
         """Map a filesystem from a log."""
         fs = Filesystem(cwd=Directory("/"))
-        i = 0
+        i = 1
         while i < len(log):
             line = log[i]
             if "cd" in line:
-                _, target = line.split()
+                _, _, target = line.split()
                 if target not in fs.cwd.children:
                     fs.cwd.children[target] = Directory(target)
 
                 fs.cwd = fs.cwd.children[target]
                 i += 1
 
+            if "ls" in line:
+                i += 1
+                while fs.has_content(log, i):
+                    content = ContentFactory.make(log[i], fs.cwd)
+                    fs.cwd.children[content.name] = content
+                    i += 1
+
         fs.cwd = fs.tree["/"]
         return fs
+
+    def has_content(self, log: List[str], i: int) -> bool:
+        try:
+            log_line = log[i]
+            return "$" not in log_line
+        except IndexError:
+            return False
