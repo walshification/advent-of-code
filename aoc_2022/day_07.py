@@ -170,13 +170,13 @@ class Filesystem:
             if "cd" in line:
                 _, _, target = line.split()
                 if ".." in target:
-                    fs.cwd = fs.cwd.parent
+                    fs.cwd = fs.cwd.parent  # type: ignore
                     i += 1
                 else:
                     # if target not in fs.cwd.children:
                     #     fs.cwd.children[target] = Directory(target)
 
-                    fs.cwd = fs.cwd.children[target]
+                    fs.cwd = fs.cwd.children[target]  # type: ignore
                     i += 1
 
             if "ls" in line:

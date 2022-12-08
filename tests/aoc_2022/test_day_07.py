@@ -36,7 +36,7 @@ def test_filesystem_goes_down_and_up():
             "$ cd asdf",
         ]
     )
-    assert fs.cwd.name == "/"
+    assert fs.cwd.name == "asdf"
 
 
 def test_filesystem_enters_existing_directories():
