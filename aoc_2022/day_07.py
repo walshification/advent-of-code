@@ -138,7 +138,7 @@ class Node:
         class_name = self.__class__.__name__
         name = self.name
         size = str(self.size)
-        parent = self.parent
+        parent = self.parent.name if self.parent else None
         children = list(name for name in self.children.keys())
         return (
             f"{class_name}(name={name}, "
@@ -216,3 +216,21 @@ class Filesystem:
             return "$" not in log_line
         except IndexError:
             return False
+
+    def size_up_to_limit(self, limit: int = 100000) -> int:
+        """Return total size of directories up to a size limit."""
+        return self._calculate_up_to_limit(self.root, limit)
+
+    def _calculate_up_to_limit(self, directory: Directory, limit: int) -> int:
+        if directory.size <= limit:
+            return directory.size + sum(
+                self._calculate_up_to_limit(content, limit)
+                for content in directory.children.values()
+                if type(content) == Directory
+            )
+
+        return sum(
+            self._calculate_up_to_limit(content, limit)
+            for content in directory.children.values()
+            if type(content) == Directory
+        )
