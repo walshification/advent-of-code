@@ -234,3 +234,13 @@ class Filesystem:
             for content in directory.children.values()
             if type(content) == Directory
         )
+
+
+if __name__ == "__main__":
+    with open("aoc_2022/inputs/day_07.txt") as data:
+        log = [line[:-1] for line in data]
+
+        fs = Filesystem.build_from_log(log)
+
+        print(f"Part One: {fs.size_up_to_limit()}")
+        # print(f"Part Two: {}")
