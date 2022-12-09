@@ -263,4 +263,4 @@ if __name__ == "__main__":
         fs = Filesystem.build_from_log(log)
 
         print(f"Part One: {fs.size_up_to_limit()}")
-        # print(f"Part Two: {}")
+        print(f"Part Two: {fs.free_storage().size}")
