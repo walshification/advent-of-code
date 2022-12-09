@@ -181,6 +181,8 @@ class ContentFactory:
 class Filesystem:
     """Filesystem of an Elven device."""
 
+    size: int = 70000000
+
     def __init__(self, root: Directory) -> None:
         self.root = root
         self.cwd = self.root
@@ -221,6 +223,13 @@ class Filesystem:
         """Return total size of directories up to a size limit."""
         return self._calculate_up_to_limit(self.root, limit)
 
+    def free_storage(self, minimum: int = 30000000) -> Directory:
+        """Return name of smallest directory for minimum freedom."""
+        target = minimum - (self.size - self.root.size)
+
+        dirs = self.check_for_best(self.root, target)
+        return min(dirs, key=lambda d: d.size)
+
     def _calculate_up_to_limit(self, directory: Directory, limit: int) -> int:
         if directory.size <= limit:
             return directory.size + sum(
@@ -234,6 +243,17 @@ class Filesystem:
             for content in directory.children.values()
             if type(content) == Directory
         )
+
+    def check_for_best(self, directory: Directory, target: int) -> List[Directory]:
+        if directory.size < target:
+            return []
+
+        return [directory] + [
+            best
+            for child in directory.children.values()
+            if type(child) == Directory
+            for best in self.check_for_best(child, target)
+        ]
 
 
 if __name__ == "__main__":
