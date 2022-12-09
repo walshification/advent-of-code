@@ -115,29 +115,152 @@ more than once!)
 Find all of the directories with a total size of at most 100000. What is
 the sum of the total sizes of those directories?
 """
-from dataclasses import dataclass, field
-from typing import Dict, Union
+from typing import Dict, List, Optional, Union
 
 
-@dataclass
-class File:
+class Node:
+    """One point in a tree."""
+
+    def __init__(
+        self,
+        name: str,
+        size: int = 0,
+        parent: Optional["Node"] = None,
+        children: Optional[Dict[str, "Node"]] = None,
+    ):
+        self.name = name
+        self.parent = parent
+        self.children = children or {}
+        self._size = size
+
+    def __repr__(self) -> str:
+        """Return repr."""
+        class_name = self.__class__.__name__
+        name = self.name
+        size = str(self.size)
+        parent = self.parent.name if self.parent else None
+        children = list(name for name in self.children.keys())
+        return (
+            f"{class_name}(name={name}, "
+            f"size={size}, parent={parent}, children={children})"
+        )
+
+    @property
+    def size(self) -> int:
+        return self._size
+
+    def child(self, node_name: str) -> "Node":
+        """Return a child node by name."""
+        return self.children[node_name]
+
+
+class File(Node):
     """Data in bytes."""
 
-    name: str
-    size: int
 
-
-@dataclass
-class Directory:
+class Directory(Node):
     """A container for directories and files."""
 
-    parent: "Directory"
-    name: str
-    size: int = 0
-    children: Dict[str, Union["Directory", File]] = field(default_factory=dict)
+    @property
+    def size(self) -> int:
+        """Return size of all directory's contents."""
+        return sum(content.size for content in self.children.values())
 
 
-class FileSystem:
-    """File system of an Elven device."""
+class ContentFactory:
+    @staticmethod
+    def make(log_line: str, cwd: Directory) -> Union[Directory, File]:
+        if "dir" in log_line:
+            _, name = log_line.split()
+            return Directory(name=name, parent=cwd)
 
-    tree: Dict[str, Union[Directory, File]] = field(default_factory=dict)
+        size, name = log_line.split()
+        return File(name=name, size=int(size), parent=cwd)
+
+
+class Filesystem:
+    """Filesystem of an Elven device."""
+
+    size: int = 70000000
+
+    def __init__(self, root: Directory) -> None:
+        self.root = root
+        self.cwd = self.root
+
+    @classmethod
+    def build_from_log(cls, log: List[str]) -> "Filesystem":
+        """Map a filesystem from a log."""
+        fs = cls(root=Directory(name="/"))
+        i = 1
+        while i < len(log):
+            line = log[i]
+            if "cd" in line:
+                _, _, target = line.split()
+                if ".." in target:
+                    fs.cwd = fs.cwd.parent  # type: ignore
+                    i += 1
+                else:
+                    fs.cwd = fs.cwd.children[target]  # type: ignore
+                    i += 1
+
+            if "ls" in line:
+                i += 1
+                while fs.has_content(log, i):
+                    content = ContentFactory.make(log[i], fs.cwd)
+                    fs.cwd.children[content.name] = content
+                    i += 1
+
+        return fs
+
+    def has_content(self, log: List[str], i: int) -> bool:
+        try:
+            log_line = log[i]
+            return "$" not in log_line
+        except IndexError:
+            return False
+
+    def size_up_to_limit(self, limit: int = 100000) -> int:
+        """Return total size of directories up to a size limit."""
+        return self._calculate_up_to_limit(self.root, limit)
+
+    def free_storage(self, minimum: int = 30000000) -> Directory:
+        """Return name of smallest directory for minimum freedom."""
+        target = minimum - (self.size - self.root.size)
+
+        dirs = self.check_for_best(self.root, target)
+        return min(dirs, key=lambda d: d.size)
+
+    def _calculate_up_to_limit(self, directory: Directory, limit: int) -> int:
+        if directory.size <= limit:
+            return directory.size + sum(
+                self._calculate_up_to_limit(content, limit)
+                for content in directory.children.values()
+                if type(content) == Directory
+            )
+
+        return sum(
+            self._calculate_up_to_limit(content, limit)
+            for content in directory.children.values()
+            if type(content) == Directory
+        )
+
+    def check_for_best(self, directory: Directory, target: int) -> List[Directory]:
+        if directory.size < target:
+            return []
+
+        return [directory] + [
+            best
+            for child in directory.children.values()
+            if type(child) == Directory
+            for best in self.check_for_best(child, target)
+        ]
+
+
+if __name__ == "__main__":
+    with open("aoc_2022/inputs/day_07.txt") as data:
+        log = [line[:-1] for line in data]
+
+        fs = Filesystem.build_from_log(log)
+
+        print(f"Part One: {fs.size_up_to_limit()}")
+        print(f"Part Two: {fs.free_storage().size}")
