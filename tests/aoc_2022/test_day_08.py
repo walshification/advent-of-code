@@ -30,7 +30,13 @@ def test_grid_can_count_the_perimeter():
 
 
 @pytest.mark.parametrize(
-    "rows", (("999", "019", "999"), ("999", "910", "999"), ("909", "919", "999"))
+    "rows",
+    (
+        ("999", "019", "999"),
+        ("999", "910", "999"),
+        ("909", "919", "999"),
+        ("999", "919", "909"),
+    ),
 )
 def test_grid_checks_visibility(rows):
     grid = Grid.from_rows(rows)

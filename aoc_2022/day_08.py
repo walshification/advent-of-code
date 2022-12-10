@@ -51,6 +51,7 @@ class Grid:
             "left": self.grid[1][0],
             "right": self.grid[1][-1],
             "top": self.grid[0][1],
+            "bottom": self.grid[-1][1],
         }
         for row in self.grid[1:-1]:
             for tree in row[1:-1]:
