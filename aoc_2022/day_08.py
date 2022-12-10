@@ -39,3 +39,10 @@ class Grid:
     @classmethod
     def from_rows(cls, rows: List[str]) -> "Grid":
         return cls([[int(i) for i in row] for row in rows])
+
+    def count_visible(self) -> int:
+        visible_trees = []
+        side = len(self.grid)
+        # Careful to only count the corners once.
+        visible_trees.append((side - 1) * 4)
+        return sum(visible_trees)
