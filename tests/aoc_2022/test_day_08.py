@@ -1,14 +1,16 @@
+import pytest
+
 from aoc_2022.day_08 import Grid
 
 
 def test_can_make_a_grid():
-    rows = [
+    rows = (
         "30373",
         "25512",
         "65332",
         "33549",
         "35390",
-    ]
+    )
     grid = Grid.from_rows(rows)
 
     assert grid.grid[0][0] == 3
@@ -17,34 +19,29 @@ def test_can_make_a_grid():
 
 
 def test_grid_can_count_the_perimeter():
-    rows = [
+    rows = (
         "313",
         "202",
         "653",
-    ]
+    )
     grid = Grid.from_rows(rows)
 
     assert grid.count_visible() == 8
 
 
-def test_grid_checks_visibility_from_left():
-    rows = [
-        "999",
-        "019",
-        "999",
-    ]
+@pytest.mark.parametrize("rows", (("999", "019", "999"), ("999", "910", "999")))
+def test_grid_checks_visibility(rows):
     grid = Grid.from_rows(rows)
-
     assert grid.count_visible() == 9
 
 
 def test_grid_checks_skips_tree_if_not_visible():
-    rows = [
+    rows = (
         "9999",
         "0109",
         "9009",
         "9999",
-    ]
+    )
     grid = Grid.from_rows(rows)
 
     assert grid.count_visible() == 13
