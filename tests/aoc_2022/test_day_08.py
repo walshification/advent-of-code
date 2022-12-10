@@ -27,6 +27,29 @@ def test_grid_can_count_the_perimeter():
     assert grid.count_visible() == 8
 
 
+def test_grid_checks_visibility_from_left():
+    rows = [
+        "999",
+        "019",
+        "999",
+    ]
+    grid = Grid.from_rows(rows)
+
+    assert grid.count_visible() == 9
+
+
+def test_grid_checks_skips_tree_if_not_visible():
+    rows = [
+        "9999",
+        "0109",
+        "9009",
+        "9999",
+    ]
+    grid = Grid.from_rows(rows)
+
+    assert grid.count_visible() == 13
+
+
 # def test_count_visible():
 #     rows = [
 #         "30373",

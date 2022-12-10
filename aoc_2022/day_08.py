@@ -26,8 +26,8 @@ are already on the edge, there are no trees to block the view.
 
 Consider your map; how many trees are visible from outside the grid?
 """
-from dataclasses import dataclass
-from typing import List
+from dataclasses import dataclass, field
+from typing import Dict, List
 
 
 @dataclass
@@ -35,6 +35,7 @@ class Grid:
     """Your basic Cartesian grid."""
 
     grid: List[List[int]]
+    sight_lines: Dict[str, int] = field(default_factory=dict)
 
     @classmethod
     def from_rows(cls, rows: List[str]) -> "Grid":
@@ -45,4 +46,13 @@ class Grid:
         side = len(self.grid)
         # Careful to only count the corners once.
         visible_trees.append((side - 1) * 4)
+
+        self.sight_lines = {
+            "left": self.grid[1][0],
+        }
+        for row in self.grid[1:-1]:
+            for tree in row[1:-1]:
+                if tree > self.sight_lines["left"]:
+                    visible_trees.append(1)
+                    self.sight_lines["left"] = tree
         return sum(visible_trees)
