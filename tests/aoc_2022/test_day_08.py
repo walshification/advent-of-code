@@ -29,7 +29,9 @@ def test_grid_can_count_the_perimeter():
     assert grid.count_visible() == 8
 
 
-@pytest.mark.parametrize("rows", (("999", "019", "999"), ("999", "910", "999")))
+@pytest.mark.parametrize(
+    "rows", (("999", "019", "999"), ("999", "910", "999"), ("909", "919", "999"))
+)
 def test_grid_checks_visibility(rows):
     grid = Grid.from_rows(rows)
     assert grid.count_visible() == 9
