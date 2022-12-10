@@ -27,7 +27,7 @@ are already on the edge, there are no trees to block the view.
 Consider your map; how many trees are visible from outside the grid?
 """
 from dataclasses import dataclass, field
-from typing import Dict, Tuple
+from typing import Dict, Set, Tuple
 
 
 @dataclass(frozen=True)
@@ -59,6 +59,11 @@ class Surveyor:
     sight_lines: Dict[str, int] = field(default_factory=dict)
 
     def count_visible(self, grid: Grid) -> int:
+        visible_trees = self.survey_perimeter(grid)
+        visible_trees.update(self.survey_inner_trees(grid))
+        return len(visible_trees)
+
+    def survey_perimeter(self, grid: Grid) -> Set[Tuple[int, int]]:
         visible_trees = set()
         side_length = len(grid)
         # Perimeter is visible.
@@ -74,16 +79,37 @@ class Surveyor:
             "top": grid[0, 1],
             "bottom": grid[-1, 1],
         }
+        return visible_trees
 
-        # visible_trees.update()
+    def survey_inner_trees(self, grid: Grid) -> Set[Tuple[int, int]]:
+        visible_trees: Set[Tuple[int, int]] = set()
         inner_height, inner_length = grid.height - 1, grid.width - 1
-        for y in range(1, inner_height + 1):
-            for x in range(1, inner_length + 1):
-                self.sight_lines["top"] = grid[0, x]
-                self.sight_lines["bottom"] = grid[-1, x]
-                tree = grid[y, x]
-                for direction, tallest in self.sight_lines.items():
-                    if tree > tallest:
-                        visible_trees.add((y, x))
-                        self.sight_lines[direction] = tree
-        return len(visible_trees)
+        return visible_trees | set(
+            visible_tree
+            for y in range(1, inner_height + 1)
+            for x in range(1, inner_length + 1)
+            for visible_tree in self.check_sight_lines(grid, y, x)
+        )
+
+    def check_sight_lines(self, grid: Grid, y: int, x: int) -> Set[Tuple[int, int]]:
+        self.adjust_vertical_sight_lines(grid[0, x], grid[-1, x])
+        tree = grid[y, x]
+        return set(
+            self.check_sight_line(tree, direction, y, x)
+            for direction in self.sight_lines.keys()
+        )
+
+    def adjust_vertical_sight_lines(
+        self, top_tallest: int, bottom_tallest: int
+    ) -> None:
+        self.sight_lines["top"] = top_tallest
+        self.sight_lines["bottom"] = bottom_tallest
+
+    def check_sight_line(
+        self, tree: int, direction: str, y: int, x: int
+    ) -> Tuple[int, int]:
+        if tree > self.sight_lines[direction]:
+            self.sight_lines[direction] = tree
+            return (y, x)
+        # Otherwise, return a tree that won't count.
+        return (0, 0)
