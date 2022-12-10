@@ -30,20 +30,37 @@ from dataclasses import dataclass, field
 from typing import Dict, Tuple
 
 
-@dataclass
+@dataclass(frozen=True)
 class Grid:
     """Your basic Cartesian grid."""
 
-    grid: Tuple[Tuple[int, ...], ...]
-    sight_lines: Dict[str, int] = field(default_factory=dict)
+    height: int
+    width: int
+    _values: Tuple[Tuple[int, ...], ...]
 
     @classmethod
     def from_rows(cls, rows: Tuple[str]) -> "Grid":
-        return cls(tuple(tuple(int(i) for i in row) for row in rows))
+        height = len(rows)
+        width = len(rows[0]) if height else 0
+        return cls(height, width, tuple(tuple(int(i) for i in row) for row in rows))
 
-    def count_visible(self) -> int:
+    def __getitem__(self, coordinates: Tuple[int, int]) -> int:
+        y, x = coordinates
+        return self._values[y][x]
+
+    def __len__(self) -> int:
+        return len(self._values)
+
+
+@dataclass
+class Surveyor:
+    """Person checking sight lines for visible trees."""
+
+    sight_lines: Dict[str, int] = field(default_factory=dict)
+
+    def count_visible(self, grid: Grid) -> int:
         visible_trees = set()
-        side_length = len(self.grid)
+        side_length = len(grid)
         # Perimeter is visible.
         for i in range(side_length):
             visible_trees.add((0, i))  # top
@@ -52,19 +69,19 @@ class Grid:
             visible_trees.add((i, side_length - 1))  # right
 
         self.sight_lines = {
-            "left": self.grid[1][0],
-            "right": self.grid[1][-1],
-            "top": self.grid[0][1],
-            "bottom": self.grid[-1][1],
+            "left": grid[1, 0],
+            "right": grid[1, -1],
+            "top": grid[0, 1],
+            "bottom": grid[-1, 1],
         }
 
         # visible_trees.update()
-        inner_length = len(self.grid[1:-1])
-        for y in range(1, inner_length + 1):
+        inner_height, inner_length = grid.height - 1, grid.width - 1
+        for y in range(1, inner_height + 1):
             for x in range(1, inner_length + 1):
-                self.sight_lines["top"] = self.grid[0][x]
-                self.sight_lines["bottom"] = self.grid[-1][x]
-                tree = self.grid[y][x]
+                self.sight_lines["top"] = grid[0, x]
+                self.sight_lines["bottom"] = grid[-1, x]
+                tree = grid[y, x]
                 for direction, tallest in self.sight_lines.items():
                     if tree > tallest:
                         visible_trees.add((y, x))

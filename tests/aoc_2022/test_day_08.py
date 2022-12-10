@@ -1,6 +1,11 @@
 import pytest
 
-from aoc_2022.day_08 import Grid
+from aoc_2022.day_08 import Grid, Surveyor
+
+
+@pytest.fixture
+def surveyor():
+    return Surveyor()
 
 
 def test_can_make_a_grid():
@@ -13,20 +18,19 @@ def test_can_make_a_grid():
     )
     grid = Grid.from_rows(rows)
 
-    assert grid.grid[0][0] == 3
-    assert grid.grid[1][3] == 1
-    assert grid.grid[len(rows) - 1][len(rows) - 1] == 0
+    assert grid[0, 0] == 3
+    assert grid[1, 3] == 1
+    assert grid[len(rows) - 1, len(rows) - 1] == 0
 
 
-def test_grid_can_count_the_perimeter():
+def test_surveyer_can_count_the_perimeter(surveyor):
     rows = (
         "313",
         "202",
         "653",
     )
     grid = Grid.from_rows(rows)
-
-    assert grid.count_visible() == 8
+    assert surveyor.count_visible(grid) == 8
 
 
 @pytest.mark.parametrize(
@@ -38,12 +42,12 @@ def test_grid_can_count_the_perimeter():
         ("999", "919", "909"),
     ),
 )
-def test_grid_checks_visibility(rows):
+def test_grid_checks_visibility(rows, surveyor):
     grid = Grid.from_rows(rows)
-    assert grid.count_visible() == 9
+    assert surveyor.count_visible(grid) == 9
 
 
-def test_grid_checks_skips_tree_if_not_visible():
+def test_grid_checks_skips_tree_if_not_visible(surveyor):
     rows = (
         "9999",
         "0109",
@@ -51,11 +55,10 @@ def test_grid_checks_skips_tree_if_not_visible():
         "9999",
     )
     grid = Grid.from_rows(rows)
+    assert surveyor.count_visible(grid) == 13
 
-    assert grid.count_visible() == 13
 
-
-def test_grid_checks_skips_tree_already_counted():
+def test_grid_checks_skips_tree_already_counted(surveyor):
     rows = (
         "9099",
         "0100",
@@ -63,11 +66,10 @@ def test_grid_checks_skips_tree_already_counted():
         "9099",
     )
     grid = Grid.from_rows(rows)
+    assert surveyor.count_visible(grid) == 13
 
-    assert grid.count_visible() == 13
 
-
-def test_grid_checks_sees_taller_trees_behind_tall_trees():
+def test_grid_checks_sees_taller_trees_behind_tall_trees(surveyor):
     rows = (
         "9999",
         "0129",
@@ -75,11 +77,10 @@ def test_grid_checks_sees_taller_trees_behind_tall_trees():
         "9999",
     )
     grid = Grid.from_rows(rows)
+    assert surveyor.count_visible(grid) == 14
 
-    assert grid.count_visible() == 14
 
-
-def test_grid_resets_sight_lines_for_top_and_bottom_on_further_rows():
+def test_grid_resets_sight_lines_for_top_and_bottom_on_further_rows(surveyor):
     rows = (
         "9909",
         "9019",
@@ -87,11 +88,10 @@ def test_grid_resets_sight_lines_for_top_and_bottom_on_further_rows():
         "9999",
     )
     grid = Grid.from_rows(rows)
+    assert surveyor.count_visible(grid) == 13
 
-    assert grid.count_visible() == 13
 
-
-def test_count_visible():
+def test_count_visible(surveyor):
     rows = [
         "30373",
         "25512",
@@ -100,4 +100,4 @@ def test_count_visible():
         "35390",
     ]
     grid = Grid.from_rows(rows)
-    assert grid.count_visible() == 21
+    assert surveyor.count_visible(grid) == 21
