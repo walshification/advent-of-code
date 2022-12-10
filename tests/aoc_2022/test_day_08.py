@@ -55,13 +55,49 @@ def test_grid_checks_skips_tree_if_not_visible():
     assert grid.count_visible() == 13
 
 
-# def test_count_visible():
-#     rows = [
-#         "30373",
-#         "25512",
-#         "65332",
-#         "33549",
-#         "35390",
-#     ]
-#     grid = Grid.from_rows(rows)
-#     assert grid.count_visible() == 21
+def test_grid_checks_skips_tree_already_counted():
+    rows = (
+        "9099",
+        "0100",
+        "9009",
+        "9099",
+    )
+    grid = Grid.from_rows(rows)
+
+    assert grid.count_visible() == 13
+
+
+def test_grid_checks_sees_taller_trees_behind_tall_trees():
+    rows = (
+        "9999",
+        "0129",
+        "9009",
+        "9999",
+    )
+    grid = Grid.from_rows(rows)
+
+    assert grid.count_visible() == 14
+
+
+def test_grid_resets_sight_lines_for_top_and_bottom_on_further_rows():
+    rows = (
+        "9909",
+        "9019",
+        "9009",
+        "9999",
+    )
+    grid = Grid.from_rows(rows)
+
+    assert grid.count_visible() == 13
+
+
+def test_count_visible():
+    rows = [
+        "30373",
+        "25512",
+        "65332",
+        "33549",
+        "35390",
+    ]
+    grid = Grid.from_rows(rows)
+    assert grid.count_visible() == 21

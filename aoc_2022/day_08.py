@@ -42,10 +42,14 @@ class Grid:
         return cls(tuple(tuple(int(i) for i in row) for row in rows))
 
     def count_visible(self) -> int:
-        visible_trees = []
-        side = len(self.grid)
-        # Careful to only count the corners once.
-        visible_trees.append((side - 1) * 4)
+        visible_trees = set()
+        side_length = len(self.grid)
+        # Perimeter is visible.
+        for i in range(side_length):
+            visible_trees.add((0, i))  # top
+            visible_trees.add((i, 0))  # left
+            visible_trees.add((side_length - 1, i))  # bottom
+            visible_trees.add((i, side_length - 1))  # right
 
         self.sight_lines = {
             "left": self.grid[1][0],
@@ -53,10 +57,16 @@ class Grid:
             "top": self.grid[0][1],
             "bottom": self.grid[-1][1],
         }
-        for row in self.grid[1:-1]:
-            for tree in row[1:-1]:
+
+        # visible_trees.update()
+        inner_length = len(self.grid[1:-1])
+        for y in range(1, inner_length + 1):
+            for x in range(1, inner_length + 1):
+                self.sight_lines["top"] = self.grid[0][x]
+                self.sight_lines["bottom"] = self.grid[-1][x]
+                tree = self.grid[y][x]
                 for direction, tallest in self.sight_lines.items():
                     if tree > tallest:
-                        visible_trees.append(1)
+                        visible_trees.add((y, x))
                         self.sight_lines[direction] = tree
-        return sum(visible_trees)
+        return len(visible_trees)
