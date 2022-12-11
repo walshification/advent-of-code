@@ -86,7 +86,7 @@ Consider each tree on your map. What is the highest scenic score
 possible for any tree?
 """
 from dataclasses import dataclass
-from typing import Iterable, Optional, Set, Tuple
+from typing import Optional, Set, Tuple
 
 
 class Point:
@@ -99,13 +99,29 @@ class Tree(Point):
     def __init__(self, height: int, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.height = height
+        self.viewing_distance_north = 0
+        self.viewing_distance_east = 0
+        self.viewing_distance_west = 0
+        self.viewing_distance_south = 0
 
     def __gt__(self, other: "Tree") -> bool:
         return self.height > other.height
 
+    def __repr__(self) -> str:
+        return f"Tree(y={self.y}, x={self.x}, height={self.height})"
+
     @property
     def position(self) -> Tuple[int, int]:
         return self.y, self.x
+
+    @property
+    def scenic_score(self) -> int:
+        return (
+            self.viewing_distance_north
+            * self.viewing_distance_east
+            * self.viewing_distance_west
+            * self.viewing_distance_south
+        )
 
 
 @dataclass(frozen=True)
@@ -135,8 +151,8 @@ class Grid:
         y, x = coordinates
         return self._grid[y][x]
 
-    def __iter__(self) -> Iterable:
-        return iter(self._grid)
+    def __iter__(self):
+        return iter([tree for row in self._grid for tree in row])
 
 
 @dataclass
@@ -145,19 +161,44 @@ class Surveyor:
 
     grid: Grid
 
-    @property
-    def visual_report(self, visible_trees: Set[Tuple[int, int]]) -> str:
-        report = "\n".join(
-            "".join(
-                " * " if tree.position in visible_trees else " ' " for tree in row
-            )
-            for row in self.grid
-        )
-        return "".join(report)
+    def survey(self) -> Tree:
+        """Return the tree with the best view of other trees."""
+        for tree in self.grid:
+            self.check_scenic_score(tree)
+
+        return max(self.grid, key=lambda t: t.scenic_score)
+
+    def check_scenic_score(self, tree: Tree) -> None:
+        for i in range(tree.y - 1, -1, -1):
+            if tree.height > self.grid[i, tree.x].height:
+                tree.viewing_distance_north += 1
+            else:
+                tree.viewing_distance_north += 1
+                break
+
+        for i in range(tree.y + 1, self.grid.height):
+            if tree.height > self.grid[i, tree.x].height:
+                tree.viewing_distance_south += 1
+            else:
+                tree.viewing_distance_south += 1
+                break
+
+        for i in range(tree.x - 1, -1, -1):
+            if tree.height > self.grid[tree.y, i].height:
+                tree.viewing_distance_west += 1
+            else:
+                tree.viewing_distance_west += 1
+                break
+
+        for i in range(tree.x + 1, self.grid.width):
+            if tree.height > self.grid[tree.y, i].height:
+                tree.viewing_distance_east += 1
+            else:
+                tree.viewing_distance_east += 1
+                break
 
     def count_visible(self) -> int:
         visible_trees = self.survey_perimeter() | self.survey_inner_trees()
-        print(self.visual_report(visible_trees))
         return len(visible_trees)
 
     def survey_perimeter(self) -> Set[Tuple[int, int]]:
@@ -208,4 +249,4 @@ if __name__ == "__main__":
         surveyor = Surveyor(grid)
 
         print(f"Part One: {surveyor.count_visible()}")
-        # print(f"Part Two: {}")
+        print(f"Part Two: {surveyor.survey().scenic_score}")

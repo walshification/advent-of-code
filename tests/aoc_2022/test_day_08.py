@@ -104,3 +104,19 @@ def test_count_visible():
     grid = Grid.from_rows(rows)
     surveyor = Surveyor(grid)
     assert surveyor.count_visible() == 21
+
+
+def test_assess_scenic_scores():
+    rows = [
+        "30373",
+        "25512",
+        "65332",
+        "33549",
+        "35390",
+    ]
+    grid = Grid.from_rows(rows)
+    surveyor = Surveyor(grid)
+    tree = surveyor.survey()
+
+    assert tree.scenic_score == 8
+    assert repr(tree) == "Tree(y=3, x=2, height=5)"
