@@ -26,8 +26,27 @@ are already on the edge, there are no trees to block the view.
 
 Consider your map; how many trees are visible from outside the grid?
 """
-from dataclasses import dataclass, field
-from typing import Dict, Set, Tuple
+from dataclasses import dataclass
+from typing import Optional, Set, Tuple
+
+
+class Point:
+    def __init__(self, y: int, x: int) -> None:
+        self.y = y
+        self.x = x
+
+
+class Tree(Point):
+    def __init__(self, height: int, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.height = height
+
+    def __gt__(self, other: "Tree") -> bool:
+        return self.height > other.height
+
+    @property
+    def position(self) -> Tuple[int, int]:
+        return self.y, self.x
 
 
 @dataclass(frozen=True)
@@ -36,80 +55,83 @@ class Grid:
 
     height: int
     width: int
-    _values: Tuple[Tuple[int, ...], ...]
+    _grid: Tuple[Tuple[Tree, ...], ...]
 
     @classmethod
-    def from_rows(cls, rows: Tuple[str]) -> "Grid":
+    def from_rows(cls, rows: Tuple[str, ...]) -> "Grid":
         height = len(rows)
         width = len(rows[0]) if height else 0
-        return cls(height, width, tuple(tuple(int(i) for i in row) for row in rows))
+        return cls(
+            height,
+            width,
+            tuple(
+                tuple(
+                    Tree(y=y, x=x, height=int(height)) for x, height in enumerate(row)
+                )
+                for y, row in enumerate(rows)
+            ),
+        )
 
-    def __getitem__(self, coordinates: Tuple[int, int]) -> int:
+    def __getitem__(self, coordinates: Tuple[int, int]) -> Tree:
         y, x = coordinates
-        return self._values[y][x]
-
-    def __len__(self) -> int:
-        return len(self._values)
+        return self._grid[y][x]
 
 
 @dataclass
 class Surveyor:
     """Person checking sight lines for visible trees."""
 
-    sight_lines: Dict[str, int] = field(default_factory=dict)
+    grid: Grid
 
-    def count_visible(self, grid: Grid) -> int:
-        visible_trees = self.survey_perimeter(grid)
-        visible_trees.update(self.survey_inner_trees(grid))
-        return len(visible_trees)
+    def count_visible(self) -> int:
+        return len(self.survey_perimeter() | self.survey_inner_trees())
 
-    def survey_perimeter(self, grid: Grid) -> Set[Tuple[int, int]]:
+    def survey_perimeter(self) -> Set[Tuple[int, int]]:
         visible_trees = set()
-        side_length = len(grid)
         # Perimeter is visible.
-        for i in range(side_length):
+        for i in range(self.grid.width):
             visible_trees.add((0, i))  # top
             visible_trees.add((i, 0))  # left
-            visible_trees.add((side_length - 1, i))  # bottom
-            visible_trees.add((i, side_length - 1))  # right
+            visible_trees.add((self.grid.width - 1, i))  # bottom
+            visible_trees.add((i, self.grid.width - 1))  # right
 
-        self.sight_lines = {
-            "left": grid[1, 0],
-            "right": grid[1, -1],
-            "top": grid[0, 1],
-            "bottom": grid[-1, 1],
-        }
         return visible_trees
 
-    def survey_inner_trees(self, grid: Grid) -> Set[Tuple[int, int]]:
-        visible_trees: Set[Tuple[int, int]] = set()
-        inner_height, inner_length = grid.height - 1, grid.width - 1
-        return visible_trees | set(
-            visible_tree
-            for y in range(1, inner_height + 1)
-            for x in range(1, inner_length + 1)
-            for visible_tree in self.check_sight_lines(grid, y, x)
-        )
-
-    def check_sight_lines(self, grid: Grid, y: int, x: int) -> Set[Tuple[int, int]]:
-        self.adjust_vertical_sight_lines(grid[0, x], grid[-1, x])
-        tree = grid[y, x]
+    def survey_inner_trees(self) -> Set[Tuple[int, int]]:
+        inner_height, inner_length = self.grid.height - 1, self.grid.width - 1
         return set(
-            self.check_sight_line(tree, direction, y, x)
-            for direction in self.sight_lines.keys()
+            visible_tree.position
+            for y in range(1, inner_height)
+            for x in range(1, inner_length)
+            if (visible_tree := self.check_sight_lines(y, x))
         )
 
-    def adjust_vertical_sight_lines(
-        self, top_tallest: int, bottom_tallest: int
-    ) -> None:
-        self.sight_lines["top"] = top_tallest
-        self.sight_lines["bottom"] = bottom_tallest
+    def check_sight_lines(self, y: int, x: int) -> Optional[Tree]:
+        tree = self.grid[y, x]
+        return (
+            self.check_sight_line(tree, set(self.grid[y, i] for i in range(0, x)))
+            or self.check_sight_line(
+                tree, set(self.grid[y, i] for i in range(x + 1, self.grid.width))
+            )
+            or self.check_sight_line(tree, set(self.grid[i, x] for i in range(0, y)))
+            or self.check_sight_line(
+                tree, set(self.grid[i, x] for i in range(y + 1, self.grid.height))
+            )
+            or None
+        )
 
-    def check_sight_line(
-        self, tree: int, direction: str, y: int, x: int
-    ) -> Tuple[int, int]:
-        if tree > self.sight_lines[direction]:
-            self.sight_lines[direction] = tree
-            return (y, x)
-        # Otherwise, return a tree that won't count.
-        return (0, 0)
+    def check_sight_line(self, tree: Tree, trees: Set[Tree]) -> Optional[Tree]:
+        if all(tree > left_tree for left_tree in trees):
+            return tree
+        return None
+
+
+if __name__ == "__main__":
+    with open("aoc_2022/inputs/day_08.txt") as data:
+        rows = tuple(line[:-1] for line in data)
+
+        grid = Grid.from_rows(rows)
+        surveyor = Surveyor(grid)
+
+        print(f"Part One: {surveyor.count_visible()}")
+        # print(f"Part Two: {}")
