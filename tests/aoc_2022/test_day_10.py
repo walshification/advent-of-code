@@ -1,4 +1,6 @@
-from aoc_2022.day_10 import Cpu
+from textwrap import dedent
+
+from aoc_2022.day_10 import Cpu, Crt
 
 
 def test_performs_noop():
@@ -167,3 +169,15 @@ def test_large_program():
     cpu = Cpu()
     strength = cpu.execute(instructions)
     assert strength == 13140
+
+
+def test_crt_renders_screen():
+    crt = Crt()
+    assert str(crt) == dedent(
+        "........................................\n"
+        "........................................\n"
+        "........................................\n"
+        "........................................\n"
+        "........................................\n"
+        "........................................"
+    )
