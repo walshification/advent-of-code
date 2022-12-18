@@ -237,13 +237,23 @@ class Cpu:
     register: int = 1
     cycles: List = field(default_factory=list)
 
-    def cycle(self, instructions: Tuple[str]) -> int:
+    def execute(self, instructions: Tuple[str]) -> int:
         """Return signal strength of the 20th, 60th, 100th, 140th,
         180th, and 220th cycles.
         """
+        key_strengths = []
         for instruction in instructions:
-            self.execute(instruction.split(" "))
+            if "noop" in instruction:
+                signals = [0]
 
-    def execute(self, instruction: List[str]) -> None:
-        if "noop" in instruction:
-            self.cycles.append(0)
+            if "addx" in instruction:
+                _, strength = instruction.split()
+                signals = [0, int(strength)]
+
+            for signal in signals:
+                self.cycles.append(signal)
+                self.register += signal
+                if len(self.cycles) in (20, 60, 100, 140, 180, 220):
+                    key_strengths.append(self.register)
+
+        return sum(key_strengths)
