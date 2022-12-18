@@ -379,31 +379,37 @@ class Cpu:
 
     register: int = 1
     cycles: List = field(default_factory=list)
+    key_strengths: List = field(default_factory=list)
+    key_cycles: List = field(default_factory=list)
 
-    def execute(self, instructions: Tuple[str]) -> int:
+    def __post_init__(self) -> None:
+        self.key_cycles.extend([220, 180, 140, 100, 60, 20])
+
+    def run(self, instructions: Tuple[str]) -> int:
         """Return signal strength of the 20th, 60th, 100th, 140th,
         180th, and 220th cycles.
         """
-        key_cycles = [220, 180, 140, 100, 60, 20]
-        key_strengths = []
         for instruction in instructions:
-            if "noop" in instruction:
-                signals = [0]
+            self.execute(instruction)
 
-            if "addx" in instruction:
-                _, strength = instruction.split()
-                signals = [0, int(strength)]
+        return sum(self.key_strengths)
 
-            for signal in signals:
-                self.cycles.append(signal)
+    def execute(self, instruction: str):
+        if "noop" in instruction:
+            signals = [0]
 
-                if len(self.cycles) in key_cycles:
-                    key = key_cycles.pop()
-                    key_strengths.append(self.register * key)
+        if "addx" in instruction:
+            _, strength = instruction.split()
+            signals = [0, int(strength)]
 
-                self.register += signal
+        for signal in signals:
+            self.cycles.append(signal)
 
-        return sum(key_strengths)
+            if len(self.cycles) in self.key_cycles:
+                key = self.key_cycles.pop()
+                self.key_strengths.append(self.register * key)
+
+            self.register += signal
 
 
 @dataclass
@@ -411,6 +417,7 @@ class Crt:
     """The CRT of my busted Elven communication device."""
 
     pixels: List[List[str]] = field(default_factory=list)
+    cpu: Cpu = field(default_factory=Cpu)
 
     def __post_init__(self) -> None:
         for _ in range(6):
@@ -420,6 +427,10 @@ class Crt:
         return "\n".join(
             "".join(pixel for pixel in row_pixels) for row_pixels in self.pixels
         )
+
+    def execute(self, instructions: Tuple[str]) -> str:
+        """Execute instructions through the CPU and render screen."""
+
 
 
 if __name__ == "__main__":
