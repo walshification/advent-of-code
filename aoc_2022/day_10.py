@@ -261,3 +261,11 @@ class Cpu:
                 self.register += signal
 
         return sum(key_strengths)
+
+
+if __name__ == "__main__":
+    with open("aoc_2022/inputs/day_10.txt") as data:
+        instructions = tuple(line[:-1] for line in data)
+
+    cpu = Cpu()
+    print(f"Part One: {cpu.execute(instructions)}")
