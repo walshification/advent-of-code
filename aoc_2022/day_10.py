@@ -241,6 +241,7 @@ class Cpu:
         """Return signal strength of the 20th, 60th, 100th, 140th,
         180th, and 220th cycles.
         """
+        key_cycles = [220, 180, 140, 100, 60, 20]
         key_strengths = []
         for instruction in instructions:
             if "noop" in instruction:
@@ -252,8 +253,11 @@ class Cpu:
 
             for signal in signals:
                 self.cycles.append(signal)
+
+                if len(self.cycles) in key_cycles:
+                    key = key_cycles.pop()
+                    key_strengths.append(self.register * key)
+
                 self.register += signal
-                if len(self.cycles) in (20, 60, 100, 140, 180, 220):
-                    key_strengths.append(self.register)
 
         return sum(key_strengths)
