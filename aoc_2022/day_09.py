@@ -72,6 +72,21 @@ position, overlapping.
 
 Simulate your complete hypothetical series of motions. How many
 positions does the tail of the rope visit at least once?
+
+--- Part Two ---
+
+A rope snaps! Suddenly, the river is getting a lot closer than you
+remember. The bridge is still there, but some of the ropes that broke
+are now whipping toward you as you fall through the air!
+
+The ropes are moving too quickly to grab; you only have a few seconds to
+choose how to arch your body to avoid being hit. Fortunately, your
+simulation can be extended to support longer ropes.
+
+Rather than two knots, you now must simulate a rope consisting of ten
+knots. One knot is still the head of the rope and moves according to the
+series of motions. Each knot further down the rope follows the knot in
+front of it using the same rules as before.
 """
 from dataclasses import dataclass, field
 from typing import Iterator, List, Tuple
@@ -86,7 +101,7 @@ class History:
     def __iter__(self) -> Iterator[Tuple[int, int]]:
         return iter(self._events)
 
-    def __str__(self) -> int:
+    def __str__(self) -> str:
         right = max(event[1] for event in self._events)
         left = min(event[1] for event in self._events)
         top = min(event[0] for event in self._events)
@@ -103,7 +118,6 @@ class History:
         self._events.append(event)
 
 
-@dataclass
 class Rope:
 
     DIRECTION_TO_MOTION_MAP = {
@@ -113,15 +127,12 @@ class Rope:
         "D": (1, 0),
     }
 
-    head: Tuple[int, int] = (0, 0)
-    tail: Tuple[int, int] = (0, 0)
-    history: History = History()
+    def __init__(self, length: int = 2) -> None:
+        self.knots = [(0, 0) for _ in range(length)]
+        self.history = History()
 
-    @property
-    def is_too_far(self) -> bool:
-        return (
-            abs(self.head[0] - self.tail[0]) > 1 or abs(self.head[1] - self.tail[1]) > 1
-        )
+    def is_too_far(self, head: Tuple[int, int], tail: Tuple[int, int]) -> bool:
+        return abs(head[0] - tail[0]) > 1 or abs(head[1] - tail[1]) > 1
 
     def move(self, motions: Tuple[str, ...]) -> int:
         """Follow a string of commands to a destination.
@@ -130,9 +141,9 @@ class Rope:
             motions: the direction and distance to follow.
 
         Returns:
-            The new position of the head.
+            The number of positions the tail (last knot) visited.
         """
-        self.history.track(self.tail)
+        self.history.track(self.knots[-1])
         for motion in motions:
             self._execute(motion)
 
@@ -143,23 +154,27 @@ class Rope:
         direction, distance = motion.split()
         delta_y, delta_x = self.DIRECTION_TO_MOTION_MAP[direction]
         for _ in range(int(distance)):
-            current_y, current_x = self.head
-            self.head = current_y + delta_y, current_x + delta_x
-            if self.is_too_far:
-                self.tail = self.follow_the_head()
-                self.history.track(self.tail)
+            current_y, current_x = self.knots[0]
+            self.knots[0] = current_y + delta_y, current_x + delta_x
+            head = self.knots[0]
+            for i in range(1, len(self.knots)):
+                tail = self.knots[i]
+                if self.is_too_far(head, tail):
+                    self.knots[i] = self.follow_the_head(head, tail)
+                head = self.knots[i]
 
-    def follow_the_head(self) -> Tuple[int, int]:
-        new_y = self.tail[0]
-        new_x = self.tail[1]
-        if self.head[0] - self.tail[0] != 0:
-            new_y += int(
-                (self.head[0] - self.tail[0]) / abs(self.head[0] - self.tail[0])
-            )
-        if self.head[1] - self.tail[1] != 0:
-            new_x += int(
-                (self.head[1] - self.tail[1]) / abs(self.head[1] - self.tail[1])
-            )
+            self.history.track(self.knots[-1])
+
+    def follow_the_head(
+        self, head: Tuple[int, int], tail: Tuple[int, int]
+    ) -> Tuple[int, int]:
+        new_y, new_x = tail
+        if head[0] - tail[0] != 0:
+            new_y += int((head[0] - tail[0]) / abs(head[0] - tail[0]))
+
+        if head[1] - tail[1] != 0:
+            new_x += int((head[1] - tail[1]) / abs(head[1] - tail[1]))
+
         return new_y, new_x
 
 
@@ -167,6 +182,5 @@ if __name__ == "__main__":
     with open("aoc_2022/inputs/day_09.txt") as data:
         motions = tuple(line[:-1] for line in data)
 
-    rope = Rope()
-    positions = rope.move(motions)
-    print(f"Part One: {positions}")
+    print(f"Part One: {Rope().move(motions)}")
+    print(f"Part Two: {Rope(10).move(motions)}")
