@@ -1,17 +1,17 @@
 from textwrap import dedent
 
-from aoc_2022.day_10 import Cpu, Crt
+from aoc_2022.day_10 import CPU, CRT
 
 
 def test_performs_noop():
-    cpu = Cpu()
+    cpu = CPU()
     cpu.run(("noop",))
     assert cpu.register == 1
     assert cpu.cycles == [0]
 
 
 def test_performs_addx():
-    cpu = Cpu()
+    cpu = CPU()
     cpu.run(("addx 3",))
     assert cpu.register == 4
     assert cpu.cycles == [0, 3]
@@ -166,13 +166,13 @@ def test_large_program():
         "noop",
         "noop",
     )
-    cpu = Cpu()
+    cpu = CPU()
     strength = cpu.run(instructions)
     assert strength == 13140
 
 
 def test_crt_renders_screen():
-    crt = Crt()
+    crt = CRT()
     assert str(crt) == dedent(
         "........................................\n"
         "........................................\n"
@@ -180,4 +180,165 @@ def test_crt_renders_screen():
         "........................................\n"
         "........................................\n"
         "........................................"
+    )
+
+
+def test_renders_large_program():
+    instructions = (
+        "addx 15",
+        "addx -11",
+        "addx 6",
+        "addx -3",
+        "addx 5",
+        "addx -1",
+        "addx -8",
+        "addx 13",
+        "addx 4",
+        "noop",
+        "addx -1",
+        "addx 5",
+        "addx -1",
+        "addx 5",
+        "addx -1",
+        "addx 5",
+        "addx -1",
+        "addx 5",
+        "addx -1",
+        "addx -35",
+        "addx 1",
+        "addx 24",
+        "addx -19",
+        "addx 1",
+        "addx 16",
+        "addx -11",
+        "noop",
+        "noop",
+        "addx 21",
+        "addx -15",
+        "noop",
+        "noop",
+        "addx -3",
+        "addx 9",
+        "addx 1",
+        "addx -3",
+        "addx 8",
+        "addx 1",
+        "addx 5",
+        "noop",
+        "noop",
+        "noop",
+        "noop",
+        "noop",
+        "addx -36",
+        "noop",
+        "addx 1",
+        "addx 7",
+        "noop",
+        "noop",
+        "noop",
+        "addx 2",
+        "addx 6",
+        "noop",
+        "noop",
+        "noop",
+        "noop",
+        "noop",
+        "addx 1",
+        "noop",
+        "noop",
+        "addx 7",
+        "addx 1",
+        "noop",
+        "addx -13",
+        "addx 13",
+        "addx 7",
+        "noop",
+        "addx 1",
+        "addx -33",
+        "noop",
+        "noop",
+        "noop",
+        "addx 2",
+        "noop",
+        "noop",
+        "noop",
+        "addx 8",
+        "noop",
+        "addx -1",
+        "addx 2",
+        "addx 1",
+        "noop",
+        "addx 17",
+        "addx -9",
+        "addx 1",
+        "addx 1",
+        "addx -3",
+        "addx 11",
+        "noop",
+        "noop",
+        "addx 1",
+        "noop",
+        "addx 1",
+        "noop",
+        "noop",
+        "addx -13",
+        "addx -19",
+        "addx 1",
+        "addx 3",
+        "addx 26",
+        "addx -30",
+        "addx 12",
+        "addx -1",
+        "addx 3",
+        "addx 1",
+        "noop",
+        "noop",
+        "noop",
+        "addx -9",
+        "addx 18",
+        "addx 1",
+        "addx 2",
+        "noop",
+        "noop",
+        "addx 9",
+        "noop",
+        "noop",
+        "noop",
+        "addx -1",
+        "addx 2",
+        "addx -37",
+        "addx 1",
+        "addx 3",
+        "noop",
+        "addx 15",
+        "addx -21",
+        "addx 22",
+        "addx -6",
+        "addx 1",
+        "noop",
+        "addx 2",
+        "addx 1",
+        "noop",
+        "addx -10",
+        "noop",
+        "noop",
+        "addx 20",
+        "addx 1",
+        "addx 2",
+        "addx 2",
+        "addx -6",
+        "addx -11",
+        "noop",
+        "noop",
+        "noop",
+    )
+    cpu = CPU()
+    cpu.run(instructions)
+    assert str(cpu.crt) == dedent(
+        "##..##..##..##..##..##..##..##..##..##..\n"
+        "###...###...###...###...###...###...###.\n"
+        "####....####....####....####....####....\n"
+        "#####.....#####.....#####.....#####.....\n"
+        "######......######......######......####\n"
+        "#######.......#######.......#######....."
     )

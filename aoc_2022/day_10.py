@@ -374,13 +374,39 @@ from typing import List, Tuple
 
 
 @dataclass
-class Cpu:
+class CRT:
+    """The CRT of my busted Elven communication device."""
+
+    pixels: List[List[str]] = field(default_factory=list)
+    row_length: int = 40
+    row_count: int = 6
+
+    def __post_init__(self) -> None:
+        self.pixels = ["." for _ in range(self.row_length * self.row_count)]
+
+    def __str__(self) -> str:
+        return "\n".join(
+            "".join(str(pixel) for pixel in self.pixels[i:i + self.row_length])
+            for i in range(0, len(self.pixels), self.row_length)
+        )
+
+    def render(self, beam_index: int, cpu_register: int) -> str:
+        """Render on the CRT the signal in the CPU register at the pixel
+        for the cycle.
+        """
+        if beam_index % 40 in (cpu_register - 1, cpu_register, cpu_register + 1):
+            self.pixels[beam_index] = "#"
+
+
+@dataclass
+class CPU:
     """The CPU of my busted Elven communication device."""
 
     register: int = 1
     cycles: List = field(default_factory=list)
     key_strengths: List = field(default_factory=list)
     key_cycles: List = field(default_factory=list)
+    crt: CRT = field(default_factory=CRT)
 
     def __post_init__(self) -> None:
         self.key_cycles.extend([220, 180, 140, 100, 60, 20])
@@ -403,39 +429,22 @@ class Cpu:
             signals = [0, int(strength)]
 
         for signal in signals:
-            self.cycles.append(signal)
+            self.cycle(signal)
 
-            if len(self.cycles) in self.key_cycles:
-                key = self.key_cycles.pop()
-                self.key_strengths.append(self.register * key)
+    def cycle(self, signal: int) -> int:
+        self.cycles.append(signal)
 
-            self.register += signal
+        if len(self.cycles) in self.key_cycles:
+            key = self.key_cycles.pop()
+            self.key_strengths.append(self.register * key)
 
-
-@dataclass
-class Crt:
-    """The CRT of my busted Elven communication device."""
-
-    pixels: List[List[str]] = field(default_factory=list)
-    cpu: Cpu = field(default_factory=Cpu)
-
-    def __post_init__(self) -> None:
-        for _ in range(6):
-            self.pixels.append(["."] * 40)
-
-    def __str__(self) -> str:
-        return "\n".join(
-            "".join(pixel for pixel in row_pixels) for row_pixels in self.pixels
-        )
-
-    def execute(self, instructions: Tuple[str]) -> str:
-        """Execute instructions through the CPU and render screen."""
-
+        self.crt.render(len(self.cycles) - 1, self.register)
+        self.register += signal
 
 
 if __name__ == "__main__":
     with open("aoc_2022/inputs/day_10.txt") as data:
         instructions = tuple(line[:-1] for line in data)
 
-    cpu = Cpu()
+    cpu = CPU()
     print(f"Part One: {cpu.execute(instructions)}")
