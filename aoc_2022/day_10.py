@@ -54,175 +54,6 @@ number multiplied by the value of the X register) during the 20th cycle
 and every 40 cycles after that (that is, during the 20th, 60th, 100th,
 140th, 180th, and 220th cycles).
 
-For example, consider this larger program:
-
-addx 15
-addx -11
-addx 6
-addx -3
-addx 5
-addx -1
-addx -8
-addx 13
-addx 4
-noop
-addx -1
-addx 5
-addx -1
-addx 5
-addx -1
-addx 5
-addx -1
-addx 5
-addx -1
-addx -35
-addx 1
-addx 24
-addx -19
-addx 1
-addx 16
-addx -11
-noop
-noop
-addx 21
-addx -15
-noop
-noop
-addx -3
-addx 9
-addx 1
-addx -3
-addx 8
-addx 1
-addx 5
-noop
-noop
-noop
-noop
-noop
-addx -36
-noop
-addx 1
-addx 7
-noop
-noop
-noop
-addx 2
-addx 6
-noop
-noop
-noop
-noop
-noop
-addx 1
-noop
-noop
-addx 7
-addx 1
-noop
-addx -13
-addx 13
-addx 7
-noop
-addx 1
-addx -33
-noop
-noop
-noop
-addx 2
-noop
-noop
-noop
-addx 8
-noop
-addx -1
-addx 2
-addx 1
-noop
-addx 17
-addx -9
-addx 1
-addx 1
-addx -3
-addx 11
-noop
-noop
-addx 1
-noop
-addx 1
-noop
-noop
-addx -13
-addx -19
-addx 1
-addx 3
-addx 26
-addx -30
-addx 12
-addx -1
-addx 3
-addx 1
-noop
-noop
-noop
-addx -9
-addx 18
-addx 1
-addx 2
-noop
-noop
-addx 9
-noop
-noop
-noop
-addx -1
-addx 2
-addx -37
-addx 1
-addx 3
-noop
-addx 15
-addx -21
-addx 22
-addx -6
-addx 1
-noop
-addx 2
-addx 1
-noop
-addx -10
-noop
-noop
-addx 20
-addx 1
-addx 2
-addx 2
-addx -6
-addx -11
-noop
-noop
-noop
-
-The interesting signal strengths can be determined as follows:
-
-    During the 20th cycle, register X has the value 21, so the signal
-        strength is 20 * 21 = 420. (The 20th cycle occurs in the middle
-        of the second addx -1, so the value of register X is the
-        starting value, 1, plus all of the other addx values up to that
-        point: 1 + 15 - 11 + 6 - 3 + 5 - 1 - 8 + 13 + 4 = 21.)
-    During the 60th cycle, register X has the value 19, so the signal
-        strength is 60 * 19 = 1140.
-    During the 100th cycle, register X has the value 18, so the signal
-        strength is 100 * 18 = 1800.
-    During the 140th cycle, register X has the value 21, so the signal
-        strength is 140 * 21 = 2940.
-    During the 180th cycle, register X has the value 16, so the signal
-        strength is 180 * 16 = 2880.
-    During the 220th cycle, register X has the value 18, so the signal
-        strength is 220 * 18 = 3960.
-
-The sum of these signal strengths is 13140.
-
 Find the signal strength during the 20th, 60th, 100th, 140th, 180th, and
 220th cycles. What is the sum of these six signal strengths?
 
@@ -259,125 +90,31 @@ such that one of its three pixels is the pixel currently being drawn,
 the screen produces a lit pixel (#); otherwise, the screen leaves the
 pixel dark (.).
 
-The first few pixels from the larger example above are drawn as follows:
-
-Sprite position: ###.....................................
-
-Start cycle   1: begin executing addx 15
-During cycle  1: CRT draws pixel in position 0
-Current CRT row: #
-
-During cycle  2: CRT draws pixel in position 1
-Current CRT row: ##
-End of cycle  2: finish executing addx 15 (Register X is now 16)
-Sprite position: ...............###......................
-
-Start cycle   3: begin executing addx -11
-During cycle  3: CRT draws pixel in position 2
-Current CRT row: ##.
-
-During cycle  4: CRT draws pixel in position 3
-Current CRT row: ##..
-End of cycle  4: finish executing addx -11 (Register X is now 5)
-Sprite position: ....###.................................
-
-Start cycle   5: begin executing addx 6
-During cycle  5: CRT draws pixel in position 4
-Current CRT row: ##..#
-
-During cycle  6: CRT draws pixel in position 5
-Current CRT row: ##..##
-End of cycle  6: finish executing addx 6 (Register X is now 11)
-Sprite position: ..........###...........................
-
-Start cycle   7: begin executing addx -3
-During cycle  7: CRT draws pixel in position 6
-Current CRT row: ##..##.
-
-During cycle  8: CRT draws pixel in position 7
-Current CRT row: ##..##..
-End of cycle  8: finish executing addx -3 (Register X is now 8)
-Sprite position: .......###..............................
-
-Start cycle   9: begin executing addx 5
-During cycle  9: CRT draws pixel in position 8
-Current CRT row: ##..##..#
-
-During cycle 10: CRT draws pixel in position 9
-Current CRT row: ##..##..##
-End of cycle 10: finish executing addx 5 (Register X is now 13)
-Sprite position: ............###.........................
-
-Start cycle  11: begin executing addx -1
-During cycle 11: CRT draws pixel in position 10
-Current CRT row: ##..##..##.
-
-During cycle 12: CRT draws pixel in position 11
-Current CRT row: ##..##..##..
-End of cycle 12: finish executing addx -1 (Register X is now 12)
-Sprite position: ...........###..........................
-
-Start cycle  13: begin executing addx -8
-During cycle 13: CRT draws pixel in position 12
-Current CRT row: ##..##..##..#
-
-During cycle 14: CRT draws pixel in position 13
-Current CRT row: ##..##..##..##
-End of cycle 14: finish executing addx -8 (Register X is now 4)
-Sprite position: ...###..................................
-
-Start cycle  15: begin executing addx 13
-During cycle 15: CRT draws pixel in position 14
-Current CRT row: ##..##..##..##.
-
-During cycle 16: CRT draws pixel in position 15
-Current CRT row: ##..##..##..##..
-End of cycle 16: finish executing addx 13 (Register X is now 17)
-Sprite position: ................###.....................
-
-Start cycle  17: begin executing addx 4
-During cycle 17: CRT draws pixel in position 16
-Current CRT row: ##..##..##..##..#
-
-During cycle 18: CRT draws pixel in position 17
-Current CRT row: ##..##..##..##..##
-End of cycle 18: finish executing addx 4 (Register X is now 21)
-Sprite position: ....................###.................
-
-Start cycle  19: begin executing noop
-During cycle 19: CRT draws pixel in position 18
-Current CRT row: ##..##..##..##..##.
-End of cycle 19: finish executing noop
-
-Start cycle  20: begin executing addx -1
-During cycle 20: CRT draws pixel in position 19
-Current CRT row: ##..##..##..##..##..
-
-During cycle 21: CRT draws pixel in position 20
-Current CRT row: ##..##..##..##..##..#
-End of cycle 21: finish executing addx -1 (Register X is now 20)
-Sprite position: ...................###..................
-
-Allowing the program to run to completion causes the CRT to produce the following image:
-
-##..##..##..##..##..##..##..##..##..##..
-###...###...###...###...###...###...###.
-####....####....####....####....####....
-#####.....#####.....#####.....#####.....
-######......######......######......####
-#######.......#######.......#######.....
-
 Render the image given by your program. What eight capital letters appear on your CRT?
 """
 from dataclasses import dataclass, field
-from typing import List, Tuple
+from typing import Callable, Dict, List, Tuple
+
+
+def noop(strength: str = "0") -> List[int]:
+    return [int(strength)]
+
+
+def addx(strength: str) -> List[int]:
+    return [0, int(strength)]
+
+
+CPU_COMMANDS: Dict[str, Callable] = {
+    "noop": noop,
+    "addx": addx,
+}
 
 
 @dataclass
 class CRT:
     """The CRT of my busted Elven communication device."""
 
-    pixels: List[List[str]] = field(default_factory=list)
+    pixels: List[str] = field(default_factory=list)
     row_length: int = 40
     row_count: int = 6
 
@@ -386,11 +123,11 @@ class CRT:
 
     def __str__(self) -> str:
         return "\n".join(
-            "".join(str(pixel) for pixel in self.pixels[i:i + self.row_length])
+            "".join(str(pixel) for pixel in self.pixels[i : i + self.row_length])
             for i in range(0, len(self.pixels), self.row_length)
         )
 
-    def render(self, beam_index: int, cpu_register: int) -> str:
+    def render(self, beam_index: int, cpu_register: int) -> None:
         """Render on the CRT the signal in the CPU register at the pixel
         for the cycle.
         """
@@ -411,7 +148,7 @@ class CPU:
     def __post_init__(self) -> None:
         self.key_cycles.extend([220, 180, 140, 100, 60, 20])
 
-    def run(self, instructions: Tuple[str]) -> int:
+    def run(self, instructions: Tuple[str, ...]) -> int:
         """Return signal strength of the 20th, 60th, 100th, 140th,
         180th, and 220th cycles.
         """
@@ -421,17 +158,13 @@ class CPU:
         return sum(self.key_strengths)
 
     def execute(self, instruction: str):
-        if "noop" in instruction:
-            signals = [0]
-
-        if "addx" in instruction:
-            _, strength = instruction.split()
-            signals = [0, int(strength)]
+        command, *args = instruction.split()
+        signals = CPU_COMMANDS[command](*args)
 
         for signal in signals:
             self.cycle(signal)
 
-    def cycle(self, signal: int) -> int:
+    def cycle(self, signal: int) -> None:
         self.cycles.append(signal)
 
         if len(self.cycles) in self.key_cycles:
@@ -447,4 +180,5 @@ if __name__ == "__main__":
         instructions = tuple(line[:-1] for line in data)
 
     cpu = CPU()
-    print(f"Part One: {cpu.execute(instructions)}")
+    print(f"Part One: {cpu.run(instructions)}")
+    print(f"Part Two:\n{cpu.crt}")
