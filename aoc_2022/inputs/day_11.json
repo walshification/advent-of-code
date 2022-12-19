@@ -1,0 +1,98 @@
+[
+  {
+    "starting": [52, 78, 79, 63, 51, 94],
+    "operation": {
+      "operator": "multiply",
+      "operand": 5
+    },
+    "test": {
+      "condition": 5,
+      "true": 1,
+      "false": 6
+    }
+  },
+  {
+    "starting": [77, 94, 70, 83, 53],
+    "operation": {
+      "operator": "plus",
+      "operand": 3
+    },
+    "test": {
+      "condition": 7,
+      "true": 5,
+      "false": 3
+    }
+  },
+  {
+    "starting": [98, 50, 76],
+    "operation": {
+      "operator": "multiply",
+      "operand": "self"
+    },
+    "test": {
+      "condition": 13,
+      "true": 0,
+      "false": 6
+    }
+  },
+  {
+    "starting": [92, 91, 61, 75, 99, 63, 84, 69],
+    "operation": {
+      "operator": "plus",
+      "operand": 5
+    },
+    "test": {
+      "condition": 11,
+      "true": 5,
+      "false": 7
+    }
+  },
+  {
+    "starting": [51, 53, 83, 52],
+    "operation": {
+      "operator": "plus",
+      "operand": 7
+    },
+    "test": {
+      "condition": 3,
+      "true": 2,
+      "false": 0
+    }
+  },
+  {
+    "starting": [76, 76],
+    "operation": {
+      "operator": "plus",
+      "operand": 4
+    },
+    "test": {
+      "condition": 2,
+      "true": 4,
+      "false": 7
+    }
+  },
+  {
+    "starting": [75, 59, 93, 69, 76, 96, 65],
+    "operation": {
+      "operator": "multiply",
+      "operand": 19
+    },
+    "test": {
+      "condition": 17,
+      "true": 1,
+      "false": 3
+    }
+  },
+  {
+    "starting": [89],
+    "operation": {
+      "operator": "plus",
+      "operand": 2
+    },
+    "test": {
+      "condition": 19,
+      "true": 2,
+      "false": 4
+    }
+  }
+]
