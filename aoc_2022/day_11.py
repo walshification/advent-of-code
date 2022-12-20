@@ -274,15 +274,15 @@ class MonkeyDef(TypedDict):
 
 
 def multiply(a: int, b: int) -> int:
-    """Return a * b divided by 3 when worry goes down."""
+    """Return a * b."""
     if a < 0:
-        return (b * b) // 3
-    return (a * b) // 3
+        return (b * b)
+    return (a * b)
 
 
 def plus(a: int, b: int) -> int:
-    """Return a + b divided by 3 when worry goes down."""
-    return (a + b) // 3
+    """Return a + b."""
+    return (a + b)
 
 
 OPERATIONS = {
@@ -337,7 +337,7 @@ class Monkey:
         Returns:
             destination, new item
         """
-        inspected_item = self.operation(item)
+        inspected_item = self.operation(item) // 3
         return self.test(inspected_item), inspected_item
 
 
@@ -346,11 +346,11 @@ class MonkeyBusinessCalculator:
     """Calculator for finding the most active monkeys."""
 
     monkeys: Dict[int, Monkey]
-    monkey_tracker: Dict[int, int] = field(default_factory=dict)
+    tracker: Dict[int, int] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         for monkey in self.monkeys.values():
-            self.monkey_tracker[monkey.name] = 0
+            self.tracker[monkey.name] = 0
 
     @classmethod
     def build(cls, data: List[MonkeyDef]) -> "MonkeyBusinessCalculator":
@@ -367,7 +367,11 @@ class MonkeyBusinessCalculator:
         """Run the monkeys and return the two most active multiplied."""
         for _ in range(limit):
             self.execute_round()
-        return multiply(*sorted([0, 0])[:2])
+
+        top_two = sorted(self.tracker.items(), key=lambda m: m[1], reverse=True)[:2]
+
+        top, second = [count[1] for count in top_two]
+        return multiply(top, second)
 
     def execute_round(self) -> None:
         """Run through a round of monkeys and their shenanigans."""
@@ -376,5 +380,4 @@ class MonkeyBusinessCalculator:
                 item = monkey.items.popleft()
                 dest, new_item = monkey.inspect(item)
                 self.monkeys[dest].items.append(new_item)
-
-            self.monkey_tracker[monkey.name] += 1
+                self.tracker[monkey.name] += 1
