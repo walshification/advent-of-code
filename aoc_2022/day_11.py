@@ -295,7 +295,7 @@ class MonkeyTest:
     true: int
     false: int
 
-    def test(self, worry_level: int) -> bool:
+    def __call__(self, worry_level: int) -> bool:
         """Execute the test and return the result."""
         if worry_level % self.condition == 0:
             return self.true
@@ -312,23 +312,35 @@ class Item:
 class Monkey:
     """A mischievious little scamp."""
 
-    starting_items: List[int]
+    name: int
+    items: List[int]
     operation: str
     test: MonkeyTest
     inspection_count: int = 0
 
+    @classmethod
     def build(
         cls,
-        starting: List[Item],
+        index: int,
+        items: List[Item],
         operation: Callable[[int, int], int],
         test: MonkeyTest,
     ) -> "Monkey":
         """Create monkeys from the data."""
         return cls(
-            starting_items=[Item(worry) for worry in starting],
+            name=index,
+            items=[Item(worry) for worry in items],
             operation=partial(OPERATIONS[operation["operator"]], operation["operand"]),
             test=test,
         )
+
+    def inspect(self, item: Item) -> Tuple[int, Item]:
+        """Test an item and perform operation on it.
+
+        Returns:
+            destination, new item
+        """
+        return self.test(item.worry_level), Item(self.operation(item.worry_level))
 
 
 class MonkeyBusinessCalculator:
