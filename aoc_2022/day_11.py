@@ -250,6 +250,7 @@ Figure out which monkeys to chase by counting how many items they
 inspect over 20 rounds. What is the level of monkey business after 20
 rounds of stuff-slinging simian shenanigans?
 """
+import json
 from collections import deque
 from dataclasses import dataclass, field
 from functools import partial
@@ -276,13 +277,13 @@ class MonkeyDef(TypedDict):
 def multiply(a: int, b: int) -> int:
     """Return a * b."""
     if a < 0:
-        return (b * b)
-    return (a * b)
+        return b * b
+    return a * b
 
 
 def plus(a: int, b: int) -> int:
     """Return a + b."""
-    return (a + b)
+    return a + b
 
 
 OPERATIONS = {
@@ -381,3 +382,10 @@ class MonkeyBusinessCalculator:
                 dest, new_item = monkey.inspect(item)
                 self.monkeys[dest].items.append(new_item)
                 self.tracker[monkey.name] += 1
+
+
+if __name__ == "__main__":
+    with open("aoc_2022/inputs/day_11.json") as data:
+        calculator = MonkeyBusinessCalculator.build(json.load(data))
+
+    print(f"Part One: {calculator.calculate()}")

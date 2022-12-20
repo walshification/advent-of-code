@@ -3,7 +3,7 @@
     "starting": [52, 78, 79, 63, 51, 94],
     "operation": {
       "operator": "multiply",
-      "operand": 5
+      "operand": 13
     },
     "test": {
       "condition": 5,
