@@ -250,9 +250,9 @@ Figure out which monkeys to chase by counting how many items they
 inspect over 20 rounds. What is the level of monkey business after 20
 rounds of stuff-slinging simian shenanigans?
 """
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from functools import partial
-from typing import Callable, Dict, List, Tuple, TypedDict
+from typing import List, Tuple, TypedDict
 
 
 class Operation(TypedDict):
@@ -270,6 +270,12 @@ class MonkeyDef(TypedDict):
     starting: List[int]
     operation: Operation
     test: MonkeyTestDef
+
+
+@dataclass
+class Item:
+
+    worry_level: int
 
 
 def multiply(a: int, b: int) -> int:
@@ -295,7 +301,7 @@ class MonkeyTest:
     true: int
     false: int
 
-    def __call__(self, worry_level: int) -> bool:
+    def __call__(self, worry_level: int) -> int:
         """Execute the test and return the result."""
         if worry_level % self.condition == 0:
             return self.true
@@ -303,18 +309,12 @@ class MonkeyTest:
 
 
 @dataclass
-class Item:
-
-    worry_level: int
-
-
-@dataclass
 class Monkey:
     """A mischievious little scamp."""
 
     name: int
-    items: List[int]
-    operation: str
+    items: List[Item]
+    operation: partial[int]
     test: MonkeyTest
     inspection_count: int = 0
 
@@ -322,8 +322,8 @@ class Monkey:
     def build(
         cls,
         index: int,
-        items: List[Item],
-        operation: Callable[[int, int], int],
+        items: List[int],
+        operation: Operation,
         test: MonkeyTest,
     ) -> "Monkey":
         """Create monkeys from the data."""
@@ -346,25 +346,25 @@ class Monkey:
 class MonkeyBusinessCalculator:
     """Calculator for finding the most active monkeys."""
 
-    monkeys: Tuple[Monkey]
-    monkey_tracker: Dict[str, int] = field(default_factory=dict)
+    # monkeys: Tuple[Monkey]
+    # monkey_tracker: Dict[str, int] = field(default_factory=dict)
 
-    @classmethod
-    def build(cls, data: List[MonkeyDef]) -> "MonkeyBusinessCalculator":
-        """Create monkeys with their attributes to calculate."""
-        monkeys = {
-            i: Monkey.build(
-                monkey["starting"], monkey["operation"], MonkeyTest(**monkey["test"])
-            )
-            for i, monkey in enumerate(data)
-        }
-        return cls(monkeys)
+    # @classmethod
+    # def build(cls, data: List[MonkeyDef]) -> "MonkeyBusinessCalculator":
+    #     """Create monkeys with their attributes to calculate."""
+    #     monkeys = tuple(
+    #         Monkey.build(
+    #             i, monkey["starting"], monkey["operation"], MonkeyTest(**monkey["test"])
+    #         )
+    #         for i, monkey in enumerate(data)
+    #     )
+    #     return cls(monkeys=monkeys)
 
-    def calculate(self, limit: int = 20) -> int:
-        """Run the monkeys and return the two most active multiplied."""
-        for _ in range(limit):
-            self.execute_round()
-        return multiply(*sorted([0, 0])[:2])
+    # def calculate(self, limit: int = 20) -> int:
+    #     """Run the monkeys and return the two most active multiplied."""
+    #     for _ in range(limit):
+    #         self.execute_round()
+    #     return multiply(*sorted([0, Item(0)])[:2])
 
-    def execute_round(self) -> None:
-        """Run through a round of monkeys and their shenanigans."""
+    # def execute_round(self) -> None:
+    #     """Run through a round of monkeys and their shenanigans."""
