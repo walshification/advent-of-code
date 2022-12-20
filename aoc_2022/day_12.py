@@ -28,9 +28,12 @@ What is the fewest steps required to move from your current position to
 the location that should get the best signal?
 """
 from dataclasses import dataclass
-from typing import Tuple
+from typing import List, Optional, Tuple
 
-CHAR_TO_HEIGHT_MAP = {c: n for n, c in enumerate("abcdefghijklmnopqrstuvwxyz")}
+CHAR_TO_HEIGHT_MAP = {
+    c: n
+    for n, c in list(enumerate("abcdefghijklmnopqrstuvwxyz")) + [(0, "S"), (25, "E")]
+}
 
 
 @dataclass
@@ -41,6 +44,48 @@ class Cell:
     x: int
     height: str
 
+    def __str__(self) -> str:
+        return self.height
+
     def __xor__(self, other: "Cell") -> bool:
         """Return if one can move from cell to other."""
         return CHAR_TO_HEIGHT_MAP[self.height] >= CHAR_TO_HEIGHT_MAP[other.height] - 1
+
+
+@dataclass
+class Terrain:
+    """Heightmap to my destination."""
+
+    grid: List[List[Cell]]
+    start: Cell
+    end: Cell
+
+    @classmethod
+    def from_input(cls, heightmap: Tuple[Tuple[str, ...], ...]) -> "Terrain":
+        """Draw the terrain from the heightmap input."""
+        grid: List[List[Cell]] = []
+        for y, row in enumerate(heightmap):
+            grid.append([])
+            for x, height in enumerate(row):
+                cell = Cell(y, x, height)
+                if height == "S":
+                    start = cell
+                if height == "E":
+                    end = cell
+                grid[y].append(cell)
+
+        return cls(grid, start, end)
+
+    def __getitem__(self, position: Tuple[int, int]) -> Optional[Cell]:
+        """Return a cell for the given position if it exists."""
+        y, x = position
+        if y < 0 or y >= len(self.grid):
+            return None
+
+        if x < 0 or x >= len(self.grid[0]):
+            return None
+
+        return self.grid[y][x]
+
+    def __str__(self) -> str:
+        return "\n".join(" ".join(str(cell) for cell in row) for row in self.grid)
