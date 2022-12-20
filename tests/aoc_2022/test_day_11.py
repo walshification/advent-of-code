@@ -78,3 +78,30 @@ def test_calculator_calculates_most_active_monkeys():
     ]
     calc = MonkeyBusinessCalculator.build(monkeys)
     assert calc.calculate() == 10605
+
+
+def test_calculator_calculates_most_active_monkeys_beyond_20():
+    monkeys = [
+        {
+            "starting": [79, 98],
+            "operation": {"operator": "multiply", "operand": 19},
+            "test": {"condition": 23, "true": 2, "false": 3},
+        },
+        {
+            "starting": [54, 65, 75, 74],
+            "operation": {"operator": "plus", "operand": 6},
+            "test": {"condition": 19, "true": 2, "false": 0},
+        },
+        {
+            "starting": [79, 60, 97],
+            "operation": {"operator": "multiply", "operand": -1},
+            "test": {"condition": 13, "true": 1, "false": 3},
+        },
+        {
+            "starting": [74],
+            "operation": {"operator": "plus", "operand": 3},
+            "test": {"condition": 17, "true": 0, "false": 1},
+        },
+    ]
+    calc = MonkeyBusinessCalculator.build(monkeys)
+    assert calc.calculate(1000, divide_by_3=False) == 26301492
