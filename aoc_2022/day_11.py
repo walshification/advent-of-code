@@ -252,7 +252,7 @@ rounds of stuff-slinging simian shenanigans?
 """
 from dataclasses import dataclass, field
 from functools import partial
-from typing import Dict, Callable, List, TypedDict, Tuple
+from typing import Callable, Dict, List, Tuple, TypedDict
 
 
 class Operation(TypedDict):
@@ -260,7 +260,7 @@ class Operation(TypedDict):
     operand: int
 
 
-class TestCaseDef(TypedDict):
+class MonkeyTestDef(TypedDict):
     condition: int
     true: int
     false: int
@@ -269,7 +269,7 @@ class TestCaseDef(TypedDict):
 class MonkeyDef(TypedDict):
     starting: List[int]
     operation: Operation
-    test: TestCaseDef
+    test: MonkeyTestDef
 
 
 def multiply(a: int, b: int) -> int:
@@ -289,14 +289,14 @@ OPERATIONS = {
 
 
 @dataclass
-class TestCase:
+class MonkeyTest:
 
     condition: int
     true: int
     false: int
 
     def test(self, worry_level: int) -> bool:
-        """Execute the testcase and return the result."""
+        """Execute the test and return the result."""
         if worry_level % self.condition == 0:
             return self.true
         return self.false
@@ -314,11 +314,14 @@ class Monkey:
 
     starting_items: List[int]
     operation: str
-    test: TestCase
+    test: MonkeyTest
     inspection_count: int = 0
 
     def build(
-        cls, starting: List[Item], operation: Callable[[int, int], int], test: TestCase
+        cls,
+        starting: List[Item],
+        operation: Callable[[int, int], int],
+        test: MonkeyTest,
     ) -> "Monkey":
         """Create monkeys from the data."""
         return cls(
@@ -339,7 +342,7 @@ class MonkeyBusinessCalculator:
         """Create monkeys with their attributes to calculate."""
         monkeys = {
             i: Monkey.build(
-                monkey["starting"], monkey["operation"], TestCase(**monkey["test"])
+                monkey["starting"], monkey["operation"], MonkeyTest(**monkey["test"])
             )
             for i, monkey in enumerate(data)
         }
