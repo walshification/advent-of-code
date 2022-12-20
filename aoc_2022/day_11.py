@@ -272,12 +272,6 @@ class MonkeyDef(TypedDict):
     test: MonkeyTestDef
 
 
-@dataclass
-class Item:
-
-    worry_level: int
-
-
 def multiply(a: int, b: int) -> int:
     """Return a * b."""
     return a * b
@@ -313,7 +307,7 @@ class Monkey:
     """A mischievious little scamp."""
 
     name: int
-    items: List[Item]
+    items: List[int]
     operation: partial[int]
     test: MonkeyTest
     inspection_count: int = 0
@@ -329,18 +323,18 @@ class Monkey:
         """Create monkeys from the data."""
         return cls(
             name=index,
-            items=[Item(worry) for worry in items],
+            items=[worry for worry in items],
             operation=partial(OPERATIONS[operation["operator"]], operation["operand"]),
             test=test,
         )
 
-    def inspect(self, item: Item) -> Tuple[int, Item]:
+    def inspect(self, item: int) -> Tuple[int, int]:
         """Test an item and perform operation on it.
 
         Returns:
             destination, new item
         """
-        return self.test(item.worry_level), Item(self.operation(item.worry_level))
+        return self.test(item), self.operation(item)
 
 
 class MonkeyBusinessCalculator:
