@@ -27,7 +27,7 @@
     "starting": [98, 50, 76],
     "operation": {
       "operator": "multiply",
-      "operand": "self"
+      "operand": -1
     },
     "test": {
       "condition": 13,
