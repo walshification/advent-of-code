@@ -166,3 +166,14 @@ class Dijkstra:
             frontier = new_frontier
 
         return self.paths[terrain.end.coordinates]
+
+
+if __name__ == "__main__":
+    with open("aoc_2022/inputs/day_12.txt") as data:
+        grid = tuple(tuple(height for height in line[:-1]) for line in data)
+
+    terrain = Terrain.from_input(grid)
+    dijkstra = Dijkstra()
+
+    print(f"Part One: {dijkstra.walk(terrain)}")
+    # print(f"Part Two: {}")
