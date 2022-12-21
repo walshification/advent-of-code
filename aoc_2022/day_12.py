@@ -39,26 +39,6 @@ the trail should still be direct, taking the fewest steps to reach its
 goal. So, you'll need to find the shortest path from any square at
 elevation a to the square marked E.
 
-Again consider the example from above:
-
-Sabqponm
-abcryxxl
-accszExk
-acctuvwj
-abdefghi
-
-Now, there are six choices for starting position (five marked a, plus
-the square marked S that counts as being at elevation a). If you start
-at the bottom-left square, you can reach the goal most quickly:
-
-...v<<<<
-...vv<<^
-...v>E^^
-.>v>>>^^
->^>>>>>^
-
-This path reaches the goal in only 29 steps, the fewest possible.
-
 What is the fewest steps required to move starting from any square with
 elevation a to the location that should get the best signal?
 """
@@ -200,18 +180,37 @@ class Dijkstra:
 
             frontier = new_frontier
 
-        return self.paths.get(terrain.end.coordinates) or 9000000
+        return self.paths[terrain.end.coordinates]
 
     def run(self, terrain: Terrain) -> int:
-        """Find all the paths to E from a and return shortest."""
-        steps = []
-        for cell in terrain:
-            if cell.height in ("a", "S"):
-                terrain.start = cell
-                self.paths = {}
-                steps.append(self.walk(terrain))
+        """Start from E and find the first a or S for shortest path."""
+        terrain.start = terrain.end
+        self.paths = {}
+        self.paths[terrain.start.coordinates] = 0
 
-        return min(steps)
+        frontier = [terrain.start]
+        while frontier:
+            new_frontier: List[Cell] = []
+
+            for cell in frontier:
+                for link in tuple(
+                    neighbor for neighbor in cell.neighbors if neighbor ^ cell
+                ):
+                    if link.coordinates in self.paths:
+                        continue
+
+                    self.paths[link.coordinates] = self.paths[cell.coordinates] + 1
+                    new_frontier.append(link)
+
+            for cell in new_frontier:
+                if cell.height in {"a", "S"}:
+                    answer = cell
+                    new_frontier = []
+                    break
+
+            frontier = new_frontier
+
+        return self.paths[answer.coordinates]
 
 
 if __name__ == "__main__":
