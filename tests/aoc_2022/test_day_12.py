@@ -60,3 +60,17 @@ def test_dijkstra_can_walk_the_terrain():
     )
     dijkstra = Dijkstra()
     assert dijkstra.walk(terrain) == 31
+
+
+def test_dijkstra_can_run_through_the_terrain():
+    terrain = Terrain.from_input(
+        (
+            ("S", "a", "b", "q", "p", "o", "n", "m"),
+            ("a", "b", "c", "r", "y", "x", "x", "l"),
+            ("a", "c", "c", "s", "z", "E", "x", "k"),
+            ("a", "c", "c", "t", "u", "v", "w", "j"),
+            ("a", "b", "d", "e", "f", "g", "h", "i"),
+        )
+    )
+    dijkstra = Dijkstra()
+    assert dijkstra.run(terrain) == 29
