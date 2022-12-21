@@ -2,7 +2,7 @@ from textwrap import dedent
 
 import pytest
 
-from aoc_2022.day_12 import Cell, Terrain
+from aoc_2022.day_12 import Cell, Dijkstra, Terrain
 
 
 @pytest.mark.parametrize(
@@ -43,7 +43,20 @@ def test_terrain_can_be_made():
     assert terrain[1, 2].south == None
     assert terrain[1, 2].west == terrain[1, 1]
 
-    assert terrain.start.is_linked(terrain[0, 1]) == True
-    assert terrain.start.is_linked(terrain[1, 0]) == False
+    assert terrain.start.links == (terrain[0, 1],)
 
-    assert terrain[1, 0].is_linked(terrain.start) == True
+    assert terrain[1, 0].links == (terrain[0, 0], terrain[1, 1])
+
+
+def test_dijkstra_can_walk_the_terrain():
+    terrain = Terrain.from_input(
+        (
+            ("S", "a", "b", "q", "p", "o", "n", "m"),
+            ("a", "b", "c", "r", "y", "x", "x", "l"),
+            ("a", "c", "c", "s", "z", "E", "x", "k"),
+            ("a", "c", "c", "t", "u", "v", "w", "j"),
+            ("a", "b", "d", "e", "f", "g", "h", "i"),
+        )
+    )
+    dijkstra = Dijkstra()
+    assert dijkstra.walk(terrain) == 31

@@ -28,7 +28,7 @@ What is the fewest steps required to move from your current position to
 the location that should get the best signal?
 """
 from dataclasses import dataclass, field
-from typing import Iterator, List, Optional, Set, Tuple
+from typing import Dict, Iterator, List, Optional, Tuple
 
 CHAR_TO_HEIGHT_MAP = {
     c: n
@@ -36,21 +36,26 @@ CHAR_TO_HEIGHT_MAP = {
 }
 
 
-@dataclass
 class Cell:
     """A unit of terrain on the map."""
 
-    y: int
-    x: int
-    height: str
-    north: Optional["Cell"] = None
-    east: Optional["Cell"] = None
-    south: Optional["Cell"] = None
-    west: Optional["Cell"] = None
-    links: Set["Cell"] = field(default_factory=set)
-
-    def __hash__(self) -> int:
-        return hash(f"({self.y}, {self.x})")
+    def __init__(
+        self,
+        y: int,
+        x: int,
+        height: str,
+        north: Optional["Cell"] = None,
+        east: Optional["Cell"] = None,
+        south: Optional["Cell"] = None,
+        west: Optional["Cell"] = None,
+    ) -> None:
+        self.y = y
+        self.x = x
+        self.height = height
+        self.north = north
+        self.east = east
+        self.south = south
+        self.west = west
 
     def __iter__(self) -> Iterator[int]:
         """Return a tuple of the cell's row and column positions."""
@@ -64,24 +69,20 @@ class Cell:
         return CHAR_TO_HEIGHT_MAP[self.height] >= CHAR_TO_HEIGHT_MAP[other.height] - 1
 
     @property
+    def coordinates(self) -> Tuple[int, int]:
+        return self.y, self.x
+
+    @property
+    def links(self) -> Tuple["Cell", ...]:
+        return tuple(cell for cell in self.neighbors if self ^ cell)
+
+    @property
     def neighbors(self) -> Tuple["Cell", ...]:
         return tuple(
             cell
             for cell in (self.north, self.east, self.south, self.west)
             if cell is not None
         )
-
-    def is_linked(self, other: "Cell") -> bool:
-        """Return whether cell is linked to other."""
-        return other in self.links
-
-    def link(self, other: "Cell") -> None:
-        """Establish a link between this cell and another.
-
-        Args:
-            other: the cell to link.
-        """
-        self.links.add(other)
 
 
 @dataclass
@@ -93,7 +94,8 @@ class Terrain:
     end: Cell
 
     def __post_init__(self) -> None:
-        self.establish_links()
+        for cell in self:
+            self.link(cell)
 
     @classmethod
     def from_input(cls, heightmap: Tuple[Tuple[str, ...], ...]) -> "Terrain":
@@ -124,15 +126,10 @@ class Terrain:
 
     def __iter__(self) -> Iterator:
         """Return each cell of the grid."""
-        return (cell for row in self.grid for cell in row)
+        return iter(cell for row in self.grid for cell in row)
 
     def __str__(self) -> str:
         return "\n".join(" ".join(str(cell) for cell in row) for row in self.grid)
-
-    def establish_links(self) -> None:
-        """Create links between passable terrain cells."""
-        for cell in self:
-            self.link(cell)
 
     def link(self, cell: Cell) -> None:
         """Configure directions."""
@@ -143,6 +140,29 @@ class Terrain:
         cell.east = self[row, column + 1]
         cell.west = self[row, column - 1]
 
-        for neighbor in cell.neighbors:
-            if cell ^ neighbor:
-                cell.link(neighbor)
+
+@dataclass
+class Dijkstra:
+    """Walk a terrain to find the shortest route to the end."""
+
+    paths: Dict[Tuple[int, int], int] = field(default_factory=dict)
+
+    def walk(self, terrain: Terrain) -> int:
+        """Return fewest steps to move from start to end of terrain."""
+        self.paths[terrain.start.coordinates] = 0
+
+        frontier = [terrain.start]
+        while frontier:
+            new_frontier = []
+
+            for cell in frontier:
+                for link in cell.links:
+                    if link.coordinates in self.paths:
+                        continue
+
+                    self.paths[link.coordinates] = self.paths[cell.coordinates] + 1
+                    new_frontier.append(link)
+
+            frontier = new_frontier
+
+        return self.paths[terrain.end.coordinates]
