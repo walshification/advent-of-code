@@ -46,10 +46,17 @@ Determine which pairs of packets are already in the right order. What is
 the sum of the indices of those pairs?
 """
 import json
+from itertools import zip_longest
 
 
 def validate(left, right) -> bool:
-    for left_item, right_item in zip(left, right):
+    for left_item, right_item in zip_longest(left, right):
+        if left_item is None:
+            return True
+
+        if right_item is None:
+            return False
+
         if type(left_item) == int and type(right_item) == int:
             if right_item < left_item:
                 return False
@@ -57,19 +64,22 @@ def validate(left, right) -> bool:
             if left_item < right_item:
                 return True
 
-        if type(left_item) == list:
+        if type(left_item) == list and type(right_item) != list:
             return validate(left_item, [right_item])
 
-        if type(right_item) == list:
+        if type(right_item) == list and type(left_item) != list:
             return validate([left_item], right_item)
+
+        if type(left_item) == list and type(right_item) == list:
+            result = validate(left_item, right_item)
+            if result is not None:
+                return result
 
 
 def compare(pairs) -> int:
     """Return the sum of the indices of pairs in the right order."""
     return sum(
-        pair_index
-        for pair_index, pair in enumerate(pairs, start=1)
-        if validate(*pair)
+        pair_index for pair_index, pair in enumerate(pairs, start=1) if validate(*pair)
     )
 
 
