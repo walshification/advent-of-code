@@ -49,8 +49,25 @@ import json
 
 
 def validate(left, right) -> bool:
-    if type(left) == int and type(right) == int:
-        return left < right
+    for left_item, right_item in zip(left, right):
+        if type(left_item) == int and type(right_item) == int:
+            if right_item < left_item:
+                return False
+
+            if left_item < right_item:
+                return True
+
+
+def compare(pairs) -> int:
+    """Return the sum of the indices of pairs in the right order."""
+    valid_pairs = []
+    for pair_index, left, right in enumerate(pairs, start=1):
+        for left_item, right_item in zip(left, right):
+            if not validate(left_item, right_item):
+                break
+            valid_pairs.append(pair_index)
+
+    return sum(valid_pairs)
 
 
 if __name__ == "__main__":
