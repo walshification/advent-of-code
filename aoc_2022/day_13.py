@@ -92,3 +92,5 @@ if __name__ == "__main__":
                 pairs[-1].append(packet)
             except json.JSONDecodeError:
                 pairs.append([])
+
+    print(f"Part One: {compare(pairs)}")
