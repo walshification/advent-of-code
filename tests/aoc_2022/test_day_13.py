@@ -15,7 +15,7 @@ def test_compare_returns_sum_of_valid_indexes():
 
 
 @pytest.mark.parametrize(
-    ("left", "right", "result"), (([3], [5], True), ([5], [3], False)),
+    ("left", "right", "result"), (([3], [5], True), ([5], [3], False))
 )
 def test_validate_compares_numbers(left, right, result):
     assert validate(left, right) == result
@@ -30,3 +30,8 @@ def test_validate_compares_numbers(left, right, result):
 )
 def test_validate_continues_comparing_if_equal(left, right, result):
     assert validate(left, right) == result
+
+
+@pytest.mark.parametrize(("left", "right"), (([1], [[2]]), ([[1]], [2])))
+def test_validate_fixes_mixed_types(left, right):
+    assert validate(left, right) == True

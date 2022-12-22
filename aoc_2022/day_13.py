@@ -57,6 +57,12 @@ def validate(left, right) -> bool:
             if left_item < right_item:
                 return True
 
+        if type(left_item) == list:
+            return validate(left_item, [right_item])
+
+        if type(right_item) == list:
+            return validate([left_item], right_item)
+
 
 def compare(pairs) -> int:
     """Return the sum of the indices of pairs in the right order."""
