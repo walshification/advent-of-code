@@ -60,14 +60,11 @@ def validate(left, right) -> bool:
 
 def compare(pairs) -> int:
     """Return the sum of the indices of pairs in the right order."""
-    valid_pairs = []
-    for pair_index, left, right in enumerate(pairs, start=1):
-        for left_item, right_item in zip(left, right):
-            if not validate(left_item, right_item):
-                break
-            valid_pairs.append(pair_index)
-
-    return sum(valid_pairs)
+    return sum(
+        pair_index
+        for pair_index, pair in enumerate(pairs, start=1)
+        if validate(*pair)
+    )
 
 
 if __name__ == "__main__":
