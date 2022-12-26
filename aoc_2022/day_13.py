@@ -44,12 +44,60 @@ What are the indices of the pairs that are already in the right order?
 
 Determine which pairs of packets are already in the right order. What is
 the sum of the indices of those pairs?
+
+--- Part Two ---
+
+Now, you just need to put all of the packets in the right order.
+Disregard the blank lines in your list of received packets.
+
+The distress signal protocol also requires that you include two
+additional divider packets:
+
+[[2]]
+[[6]]
+
+Using the same rules as before, organize all packets - the ones in your
+list of received packets as well as the two divider packets - into the
+correct order.
+
+For the example above, the result of putting the packets in the correct
+order is:
+
+[]
+[[]]
+[[[]]]
+[1,1,3,1,1]
+[1,1,5,1,1]
+[[1],[2,3,4]]
+[1,[2,[3,[4,[5,6,0]]]],8,9]
+[1,[2,[3,[4,[5,6,7]]]],8,9]
+[[1],4]
+[[2]]
+[3]
+[[4,4],4,4]
+[[4,4],4,4,4]
+[[6]]
+[7,7,7]
+[7,7,7,7]
+[[8,7,6]]
+[9]
+
+Afterward, locate the divider packets. To find the decoder key for this
+distress signal, you need to determine the indices of the two divider
+packets and multiply them together. (The first packet is at index 1, the
+second packet is at index 2, and so on.) In this example, the divider
+packets are 10th and 14th, and so the decoder key is 140.
+
+Organize all of the packets into the correct order. What is the decoder
+key for the distress signal?
 """
 import json
 from itertools import zip_longest
+from typing import Optional
 
 
-def validate(left, right) -> bool:
+def validate(left, right) -> Optional[bool]:
+    """Return whether two lists are in the right order."""
     for left_item, right_item in zip_longest(left, right):
         if left_item is None:
             return True
@@ -74,6 +122,7 @@ def validate(left, right) -> bool:
             result = validate(left_item, right_item)
             if result is not None:
                 return result
+    return None
 
 
 def compare(pairs) -> int:
@@ -83,9 +132,40 @@ def compare(pairs) -> int:
     )
 
 
+def sort(pairs):
+    """For each packet in the signal, sort the packets per the rules."""
+    sorted_signal = [[[2]], [[6]]]
+    for pair in pairs:
+        for packet in pair:
+            for index in range(len(sorted_signal)):
+                print(index)
+                print(sorted_signal)
+                sorted_packet = sorted_signal.pop(index)
+                if validate(packet, sorted_packet):
+                    sorted_signal.insert(index, packet)
+                    sorted_signal.insert(index + 1, sorted_packet)
+                    break
+                else:
+                    sorted_signal.insert(index, sorted_packet)
+
+    for item in sorted_signal:
+        print(item)
+    return [
+        index + 1
+        for index in range(len(sorted_signal))
+        if sorted_signal[index] == [[2]]
+    ][0] * [
+        index + 1
+        for index in range(len(sorted_signal))
+        if sorted_signal[index] == [[6]]
+    ][
+        0
+    ]
+
+
 if __name__ == "__main__":
     with open("aoc_2022/inputs/day_13.txt") as data:
-        pairs = [[]]
+        pairs = [[]]  # type: ignore
         for line in data:
             try:
                 packet = json.loads(line)
@@ -94,3 +174,4 @@ if __name__ == "__main__":
                 pairs.append([])
 
     print(f"Part One: {compare(pairs)}")
+    print(f"Part Two: {sort(pairs)}")
