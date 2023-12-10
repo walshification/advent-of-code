@@ -35,7 +35,7 @@ from typing import Dict, List, Sequence, Set
 Point = namedtuple("Point", ("x", "y"))
 
 
-def collect_symbols(schematic: Sequence[str]) -> Dict[Point, List[str]]:
+def collect_symbols(schematic: Sequence[str]) -> Dict[Point, List[int]]:
     return {
         Point(x, y): []
         for x in range(len(schematic))
@@ -45,13 +45,13 @@ def collect_symbols(schematic: Sequence[str]) -> Dict[Point, List[str]]:
 
 
 def collect_parts(
-    symbols: Dict[Point, List[str]], schematic: Sequence[str]
-) -> Dict[Point, List[str]]:
+    symbols: Dict[Point, List[int]], schematic: Sequence[str]
+) -> Dict[Point, List[int]]:
     for x, row in enumerate(schematic):
         for number in re.finditer(r"\d+", row):
             edges = collect_edges(number, x)
             for point in edges & symbols.keys():
-                symbols[point].append(number.group())
+                symbols[point].append(int(number.group()))
 
     return symbols
 
@@ -64,12 +64,19 @@ def collect_edges(number: re.Match, found: int) -> Set[Point]:
     }
 
 
-def sum_parts(parts_map: Dict[Point, List[str]]) -> int:
-    return sum(int(part) for parts in parts_map.values() for part in parts)
+def sum_parts(parts_map: Dict[Point, List[int]]) -> int:
+    return sum(sum(parts) for parts in parts_map.values())
+
+
+def sum_gear_ratios(parts_map: Dict[Point, List[int]]) -> int:
+    return sum(parts[0] * parts[1] for parts in parts_map.values() if len(parts) == 2)
 
 
 if __name__ == "__main__":
     with open("aoc_2023/inputs/day_03.txt") as data:
         schematic = tuple(line for line in data)
 
-    print(f"Part 1: {sum_parts(collect_parts(collect_symbols(schematic), schematic))}")
+    symbols_map = collect_symbols(schematic)
+    parts_map = collect_parts(symbols_map, schematic)
+    print(f"Part 1: {sum_parts(parts_map)}")
+    print(f"Part 1: {sum_gear_ratios(parts_map)}")

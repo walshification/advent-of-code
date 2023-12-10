@@ -7,6 +7,7 @@ from aoc_2023.day_03 import (
     collect_edges,
     collect_parts,
     collect_symbols,
+    sum_gear_ratios,
     sum_parts,
 )
 
@@ -105,17 +106,14 @@ def test_collect_parts():
         value
         for values in collect_parts(collect_symbols(SCHEMATIC), SCHEMATIC).values()
         for value in values
-    } == {
-        "467",
-        "35",
-        "633",
-        "617",
-        "592",
-        "755",
-        "664",
-        "598",
-    }
+    } == {467, 35, 633, 617, 592, 755, 664, 598}
 
 
 def test_sum_parts():
     assert sum_parts(collect_parts(collect_symbols(SCHEMATIC), SCHEMATIC)) == 4361
+
+
+def test_sum_gears():
+    assert (
+        sum_gear_ratios(collect_parts(collect_symbols(SCHEMATIC), SCHEMATIC)) == 467835
+    )
